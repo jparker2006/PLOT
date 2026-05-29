@@ -16,6 +16,8 @@ dependencies = [
     "matplotlib>=3.8",
     "tqdm>=4.66",
     "pyyaml>=6.0",
+    "lightgbm>=4.3",
+    "scikit-learn>=1.4",
 ]
 
 [dependency-groups]

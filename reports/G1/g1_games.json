@@ -1,0 +1,216 @@
+[
+  {
+    "game_id": "0021500053",
+    "status": "ok",
+    "n_rows": 31723,
+    "backcourt_fraction": 0.1942,
+    "cached": true
+  },
+  {
+    "game_id": "0021500064",
+    "matchup": "ORL@HOU",
+    "orientation": {
+      "cells": {
+        "1610612745|1": {
+          "mean_x": 42.21,
+          "n": 12960,
+          "rim": "L",
+          "strength": 4.79
+        },
+        "1610612745|2": {
+          "mean_x": 45.99,
+          "n": 14955,
+          "rim": "L",
+          "strength": 1.01
+        },
+        "1610612753|1": {
+          "mean_x": 44.78,
+          "n": 10799,
+          "rim": "L",
+          "strength": 2.22
+        },
+        "1610612753|2": {
+          "mean_x": 48.71,
+          "n": 11327,
+          "rim": "R",
+          "strength": 1.71
+        }
+      },
+      "quarantined": true,
+      "reason": "no_confident_orientation_cell"
+    },
+    "status": "quarantined",
+    "reason": "orientation:no_confident_orientation_cell"
+  },
+  {
+    "game_id": "0021500077",
+    "matchup": "LAL@BKN",
+    "orientation": {
+      "cells": {
+        "1610612747|1": {
+          "mean_x": 51.02,
+          "n": 15151,
+          "rim": "R",
+          "strength": 4.02
+        },
+        "1610612747|2": {
+          "mean_x": 46.79,
+          "n": 14228,
+          "rim": "L",
+          "strength": 0.21
+        },
+        "1610612751|1": {
+          "mean_x": 43.32,
+          "n": 10883,
+          "rim": "L",
+          "strength": 3.68
+        },
+        "1610612751|2": {
+          "mean_x": 50.37,
+          "n": 12411,
+          "rim": "R",
+          "strength": 3.37
+        }
+      },
+      "quarantined": true,
+      "reason": "no_confident_orientation_cell"
+    },
+    "status": "quarantined",
+    "reason": "orientation:no_confident_orientation_cell"
+  },
+  {
+    "game_id": "0021500101",
+    "status": "ok",
+    "n_rows": 32457,
+    "backcourt_fraction": 0.1902,
+    "cached": true
+  },
+  {
+    "game_id": "0021500160",
+    "status": "ok",
+    "n_rows": 31050,
+    "backcourt_fraction": 0.2539,
+    "cached": true
+  },
+  {
+    "game_id": "0021500203",
+    "status": "ok",
+    "n_rows": 30794,
+    "backcourt_fraction": 0.1749,
+    "cached": true
+  },
+  {
+    "game_id": "0021500226",
+    "status": "ok",
+    "n_rows": 32618,
+    "backcourt_fraction": 0.1958,
+    "cached": true
+  },
+  {
+    "game_id": "0021500341",
+    "status": "ok",
+    "n_rows": 32370,
+    "backcourt_fraction": 0.1372,
+    "cached": true
+  },
+  {
+    "game_id": "0021500384",
+    "matchup": "OKC@CLE",
+    "orientation": {
+      "cells": {
+        "1610612739|1": {
+          "mean_x": 45.73,
+          "n": 8615,
+          "rim": "L",
+          "strength": 1.27
+        },
+        "1610612739|2": {
+          "mean_x": 42.89,
+          "n": 10159,
+          "rim": "L",
+          "strength": 4.11
+        },
+        "1610612760|1": {
+          "mean_x": 45.76,
+          "n": 9886,
+          "rim": "L",
+          "strength": 1.24
+        },
+        "1610612760|2": {
+          "mean_x": 49.63,
+          "n": 9197,
+          "rim": "R",
+          "strength": 2.63
+        }
+      },
+      "quarantined": true,
+      "reason": "no_confident_orientation_cell"
+    },
+    "status": "quarantined",
+    "reason": "orientation:no_confident_orientation_cell"
+  },
+  {
+    "game_id": "0021500418",
+    "status": "ok",
+    "n_rows": 32143,
+    "backcourt_fraction": 0.1512,
+    "cached": true
+  },
+  {
+    "game_id": "0021500499",
+    "matchup": "ORL@CLE",
+    "orientation": {
+      "cells": {
+        "1610612739|1": {
+          "mean_x": 42.55,
+          "n": 12907,
+          "rim": "L",
+          "strength": 4.45
+        },
+        "1610612739|2": {
+          "mean_x": 52.38,
+          "n": 12202,
+          "rim": "R",
+          "strength": 5.38
+        },
+        "1610612753|1": {
+          "mean_x": 44.85,
+          "n": 8599,
+          "rim": "L",
+          "strength": 2.15
+        },
+        "1610612753|2": {
+          "mean_x": 44.11,
+          "n": 11409,
+          "rim": "L",
+          "strength": 2.89
+        }
+      },
+      "quarantined": true,
+      "reason": "single_confident_cell_no_corroboration"
+    },
+    "status": "quarantined",
+    "reason": "orientation:single_confident_cell_no_corroboration"
+  },
+  {
+    "game_id": "0021500528",
+    "status": "ok",
+    "n_rows": 32238,
+    "backcourt_fraction": 0.2155,
+    "cached": true
+  },
+  {
+    "game_id": "0021500563",
+    "status": "ok",
+    "n_rows": 33486,
+    "backcourt_fraction": 0.3252,
+    "cached": true
+  },
+  {
+    "game_id": "0021500618",
+    "status": "ok",
+    "n_rows": 32938,
+    "backcourt_fraction": 0.1238,
+    "cached": true
+  }
+]

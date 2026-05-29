@@ -32,6 +32,27 @@ regret:
   report_signed: true
   chosen_value_basis: "expected"   # "expected" (model EV) vs "realized"
 
+eval_bar:                  # Stage 2 baseline EPV ("eval bar")
+  n_classes: 4             # points outcome head {0,1,2,3}; rare 4-pt clamped to 3
+  fps_bucket_ms: 100       # downsample 25 -> ~10 fps by wall-clock bucket
+  deep_margin_ft: 20.0     # orientation: ball deep-frontcourt threshold (|x-47|)
+  orientation_min_frames: 200
+  orientation_strong_ft: 5.0
+  backcourt_quarantine: 0.40   # QC: quarantine a game whose canonical backcourt fraction exceeds this
+  handler_ball_max_ft: 6.0     # offensive player within this of the ball = ball-handler
+  lightgbm:
+    num_leaves: 31
+    learning_rate: 0.03
+    feature_fraction: 0.8
+    bagging_fraction: 0.8
+    lambda_l2: 1.0
+    min_child_samples: 200
+    min_data_in_bin: 50
+    num_boost_round: 400
+    early_stopping_rounds: 50   # mirrors the code default; loaded live by scripts/train_eval_bar_g1.py
+  reliability_bins: 15
+  bootstrap_B: 400
+
 demo_games:
   kobe_farewell:
     date: "2016-04-13"

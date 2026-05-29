@@ -27,11 +27,25 @@ game/shot clock. The eval bar and per-decision regret overlay come in later stag
 
 ![PLOT Stage-1 proof of life: a LeBron Cavs possession animated from tracking data](docs/proof_of_life.gif)
 
+## Eval bar (Stage 2) — Gate G1: PASS
+
+The baseline **eval bar** predicts per-moment EPV (expected points the possession will yield)
+from coarse location/context features via a LightGBM multiclass outcome head. On leave-one-game-out
+held-out games it is well calibrated — calibration-in-the-large **+0.006**, ECE **0.054** points,
+and it beats a constant-rate baseline on log-loss, Brier, and the ordinal RPS. It is a deliberately
+decision-insensitive *location prior*; the per-action value and regret metric build on it in later
+stages. Full report + figures: [`reports/G1/`](reports/G1/README.md).
+
+```bash
+uv run python scripts/build_eval_bar_features.py   # cache per-game features (+orientation/QC)
+uv run python scripts/train_eval_bar_g1.py         # LOGO calibration -> reports/G1/
+```
+
 ## Quickstart
 
 ```bash
 # Python env (pinned to 3.12 via uv)
-uv sync
+uv sync          # on macOS, LightGBM needs the OpenMP runtime: `brew install libomp`
 
 # Download one game and verify the data schema
 uv run python scripts/download_data.py --tier T0

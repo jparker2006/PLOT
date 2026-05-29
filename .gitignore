@@ -34,3 +34,6 @@ web/node_modules/
 .DS_Store
 .vscode/
 .idea/
+
+# Local agent / session state (plans, workflow scripts, transcripts) — never commit
+.claude/
