@@ -67,8 +67,8 @@ def test_validation_all_checks_pass_and_points_reconcile():
     for k, v in checks.items():
         if k != "summary":
             assert v, f"check failed: {k}"
-    assert checks["summary"]["points_home"] == 7
-    assert checks["summary"]["points_visitor"] == 2
+    assert checks["summary"]["team_points"] == {"home": 7, "visitor": 2}
+    assert checks["summary"]["segmenter_points"] == {"home": 7, "visitor": 2}
 
 
 def test_phantom_offensive_rebound_after_made_fg_is_skipped():
