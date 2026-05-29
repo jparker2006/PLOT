@@ -24,3 +24,8 @@ def eval_bar_lightgbm(cfg: dict) -> tuple[dict, int, int]:
     num_boost_round = int(lgb.pop("num_boost_round", 400))
     early_stopping_rounds = int(lgb.pop("early_stopping_rounds", 50))
     return lgb, num_boost_round, early_stopping_rounds
+
+
+def seq_epv_config(cfg: dict) -> dict:
+    """The seq_epv hyperparameter block (the sequence EPV model reads it via train_seq)."""
+    return dict(cfg.get("seq_epv") or {})

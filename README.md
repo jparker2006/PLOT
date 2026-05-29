@@ -29,16 +29,27 @@ game/shot clock. The eval bar and per-decision regret overlay come in later stag
 
 ## Eval bar (Stage 2) — Gate G1: PASS
 
-The baseline **eval bar** predicts per-moment EPV (expected points the possession will yield)
-from coarse location/context features via a LightGBM multiclass outcome head. On leave-one-game-out
-held-out games it is well calibrated — calibration-in-the-large **+0.006**, ECE **0.054** points,
-and it beats a constant-rate baseline on log-loss, Brier, and the ordinal RPS. It is a deliberately
-decision-insensitive *location prior*; the per-action value and regret metric build on it in later
-stages. Full report + figures: [`reports/G1/`](reports/G1/README.md).
+The **eval bar** predicts per-moment EPV (expected points the possession will yield) and reads it
+off a multiclass outcome head over points `{0,1,2,3}` as `EPV = Σ_k k·P(points=k)`. Both models are
+validated under leave-one-game-out cross-validation on held-out **games**, with the identical
+calibration code and quarantine — so the upgrade below is an apples-to-apples comparison.
+
+- **Baseline (LightGBM, location/context prior).** Coarse per-frame features (canonical ball
+  geometry, region, clocks, score margin, paint counts, ball-handler pressure). Well calibrated:
+  calibration-in-the-large **+0.006**, ECE **0.054** pts, beats a constant-rate baseline on log-loss,
+  Brier, and the ordinal RPS. Deliberately decision-insensitive. Report: [`reports/G1/`](reports/G1/README.md).
+- **Sequence upgrade (PyTorch, full ten-player tracking).** A permutation-invariant DeepSets set
+  encoder over the ten players → a **causal** GRU over the 10 fps sequence → the same outcome head.
+  It beats the baseline on every proper score — log-loss **0.819 vs 1.014**, Brier **0.461 vs 0.570**,
+  RPS **0.428 vs 0.545** — and tightens the calibration slope from 1.15 to **0.96**, while staying
+  calibrated (ECE 0.063, cal-in-large −0.012). Report: [`reports/G1_seq/`](reports/G1_seq/README.md).
 
 ```bash
-uv run python scripts/build_eval_bar_features.py   # cache per-game features (+orientation/QC)
-uv run python scripts/train_eval_bar_g1.py         # LOGO calibration -> reports/G1/
+uv run python scripts/build_eval_bar_features.py     # cache per-game features (+orientation/QC)
+uv run python scripts/train_eval_bar_g1.py           # baseline LOGO calibration -> reports/G1/
+
+uv sync --extra seq                                  # installs torch (MPS/CPU on macOS)
+uv run --extra seq python scripts/train_seq_epv_g1.py  # sequence LOGO calibration -> reports/G1_seq/
 ```
 
 ## Quickstart

@@ -1,0 +1,106 @@
+[
+  {
+    "game_id": "0021500053",
+    "status": "ok",
+    "cached": true,
+    "n_possessions": 192,
+    "n_frames": 31723,
+    "backcourt_fraction": 0.1942
+  },
+  {
+    "game_id": "0021500064",
+    "matchup": "ORL@HOU",
+    "status": "quarantined",
+    "reason": "orientation:no_confident_orientation_cell"
+  },
+  {
+    "game_id": "0021500077",
+    "matchup": "LAL@BKN",
+    "status": "quarantined",
+    "reason": "orientation:no_confident_orientation_cell"
+  },
+  {
+    "game_id": "0021500101",
+    "status": "ok",
+    "cached": true,
+    "n_possessions": 173,
+    "n_frames": 32457,
+    "backcourt_fraction": 0.1902
+  },
+  {
+    "game_id": "0021500160",
+    "status": "ok",
+    "cached": true,
+    "n_possessions": 188,
+    "n_frames": 31050,
+    "backcourt_fraction": 0.2539
+  },
+  {
+    "game_id": "0021500203",
+    "status": "ok",
+    "cached": true,
+    "n_possessions": 175,
+    "n_frames": 30794,
+    "backcourt_fraction": 0.1749
+  },
+  {
+    "game_id": "0021500226",
+    "status": "ok",
+    "cached": true,
+    "n_possessions": 156,
+    "n_frames": 32618,
+    "backcourt_fraction": 0.1958
+  },
+  {
+    "game_id": "0021500341",
+    "status": "ok",
+    "cached": true,
+    "n_possessions": 173,
+    "n_frames": 32370,
+    "backcourt_fraction": 0.1372
+  },
+  {
+    "game_id": "0021500384",
+    "matchup": "OKC@CLE",
+    "status": "quarantined",
+    "reason": "orientation:no_confident_orientation_cell"
+  },
+  {
+    "game_id": "0021500418",
+    "status": "ok",
+    "cached": true,
+    "n_possessions": 176,
+    "n_frames": 32143,
+    "backcourt_fraction": 0.1512
+  },
+  {
+    "game_id": "0021500499",
+    "matchup": "ORL@CLE",
+    "status": "quarantined",
+    "reason": "orientation:single_confident_cell_no_corroboration"
+  },
+  {
+    "game_id": "0021500528",
+    "status": "ok",
+    "cached": true,
+    "n_possessions": 187,
+    "n_frames": 32238,
+    "backcourt_fraction": 0.2155
+  },
+  {
+    "game_id": "0021500563",
+    "status": "ok",
+    "cached": true,
+    "n_possessions": 175,
+    "n_frames": 33486,
+    "backcourt_fraction": 0.3252
+  },
+  {
+    "game_id": "0021500618",
+    "status": "ok",
+    "cached": true,
+    "n_possessions": 179,
+    "n_frames": 32938,
+    "backcourt_fraction": 0.1238
+  }
+]

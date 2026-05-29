@@ -53,6 +53,24 @@ eval_bar:                  # Stage 2 baseline EPV ("eval bar")
   reliability_bins: 15
   bootstrap_B: 400
 
+seq_epv:                   # Stage 2 UPGRADE: sequence EPV (per-player set encoder -> causal GRU)
+  # Shares the eval_bar target {0,1,2,3}, the clean-game/quarantine split, and calibration.py,
+  # so its G1 is directly comparable to the baseline. Goal: beat the baseline + tighten slope.
+  player_embed_dim: 64     # per-player shared MLP width (DeepSets phi)
+  frame_embed_dim: 96      # frame embedding after set pooling + ball/context concat
+  gru_hidden: 128          # causal GRU hidden size (unidirectional -> no future leakage)
+  gru_layers: 1
+  dropout: 0.1
+  encoder: "deepsets"      # "deepsets" (off/def masked mean+max pool) | "attention" (future)
+  lr: 0.001
+  weight_decay: 0.00001
+  batch_possessions: 64    # batch unit is the POSSESSION (padded in time)
+  min_epochs: 5            # never freeze a barely-trained model on a noisy single-game val signal
+  max_epochs: 40
+  patience: 6              # early stop on inner-val weighted frame logloss (after min_epochs)
+  grad_clip: 5.0
+  max_frames: 320          # cap a possession's frame count (keep the most recent; ~32 s at 10 fps)
+
 demo_games:
   kobe_farewell:
     date: "2016-04-13"

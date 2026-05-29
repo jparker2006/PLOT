@@ -20,6 +20,14 @@ dependencies = [
     "scikit-learn>=1.4",
 ]
 
+[project.optional-dependencies]
+# The sequence EPV model (Stage 2 upgrade). Kept out of the base install: it is the only
+# torch dependency, Kaggle/Colab images already ship torch, and the CPU baseline + all data
+# code run without it. Locally: `uv sync --extra seq` (installs the MPS/CPU build on macOS).
+seq = [
+    "torch>=2.2",
+]
+
 [dependency-groups]
 dev = [
     "pytest>=8.0",

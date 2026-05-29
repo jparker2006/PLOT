@@ -10,23 +10,15 @@ lowest-variance unbiased held-out calibration estimate at n~10 games, spending n
 
 from __future__ import annotations
 
-import numpy as np
 import polars as pl
 
 from plot.features.eval_bar import GROUP_COLUMN, LABEL_COLUMN, WEIGHT_COLUMN
 from plot.models.eval_bar.dataset import logo_folds
+from plot.models.eval_bar.folds import inner_val_game, oof_arrays  # noqa: F401  (re-exported)
 from plot.models.eval_bar.model import N_CLASSES, predict_epv, train_booster
 
-
-def _inner_val_game(train_ids: list[str], held: str) -> str:
-    """Deterministic grouped watch game for early stopping: the next game after ``held`` (rotating)."""
-    ordered = sorted(set(train_ids) | {held})
-    i = ordered.index(held)
-    for step in range(1, len(ordered)):
-        cand = ordered[(i + step) % len(ordered)]
-        if cand != held and cand in train_ids:
-            return cand
-    return train_ids[0]
+# back-compat alias for the private name used in the baseline script/tests
+_inner_val_game = inner_val_game
 
 
 def run_logo(
@@ -63,17 +55,3 @@ def run_logo(
                       "n_test": held_df.height, "best_iteration": int(booster.best_iteration or num_boost_round)})
     oof = pl.concat(oof_parts) if oof_parts else pl.DataFrame()
     return {"oof": oof, "folds": folds, "games": games}
-
-
-def oof_arrays(oof: pl.DataFrame) -> dict:
-    """Unpack the OOF DataFrame into numpy arrays for the calibration metrics."""
-    K = sum(c.startswith("p") and c[1:].isdigit() for c in oof.columns)
-    probs = np.column_stack([oof[f"p{k}"].to_numpy() for k in range(K)])
-    return {
-        "epv": oof["epv"].to_numpy(),
-        "probs": probs,
-        "y": oof["y"].to_numpy(),
-        "weight": oof[WEIGHT_COLUMN].to_numpy(),
-        "game_id": oof[GROUP_COLUMN].to_numpy(),
-        "possession_id": oof["possession_id"].to_numpy(),
-    }
