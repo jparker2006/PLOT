@@ -1,0 +1,40 @@
+# PLOT default configuration.
+seed: 1729
+
+data:
+  hf_repo: "dcayton/nba_tracking_data_15_16"
+  hf_repo_type: "dataset"
+  raw_dir: "data/raw"
+  interim_dir: "data/interim"
+  processed_dir: "data/processed"
+  subset_tier: "T0"        # T0=1 game, T1=~5 games, T2=team/HF-small, T3=full season
+  model_fps: 10            # downsample tracking to this rate for modeling
+  demo_fps: 25             # keep full rate only for demo clips
+
+# SportVU coordinate system is in feet; full court is 94 x 50.
+# Values below are standard NBA geometry — VERIFY against the real data in Stage 1.
+court:
+  length_ft: 94.0
+  width_ft: 50.0
+  hoop_left_x_ft: 5.25
+  hoop_right_x_ft: 88.75
+  hoop_y_ft: 25.0
+  rim_radius_ft: 0.75
+  three_point_radius_ft: 23.75
+  corner_three_x_ft: 22.0
+
+openness:
+  open_ft: 4.0             # nearest defender >= 4 ft  -> "open"
+  wide_open_ft: 6.0        # nearest defender >= 6 ft  -> "wide open"
+
+regret:
+  report_clipped: true
+  report_signed: true
+  chosen_value_basis: "expected"   # "expected" (model EV) vs "realized"
+
+demo_games:
+  kobe_farewell:
+    date: "2016-04-13"
+    home: "Lakers"
+    away: "Jazz"
+  lebron_cavs: null        # choose a regular-season Cavs game once data is verified

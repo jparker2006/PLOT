@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Data — never commit raw or large derived data (see DATA.md)
+data/raw/*
+data/interim/*
+data/processed/*
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+*.7z
+*.parquet
+*.feather
+
+# Models / experiment artifacts
+*.pt
+*.ckpt
+artifacts/
+wandb/
+
+# Node / Next.js
+node_modules/
+web/.next/
+web/out/
+web/node_modules/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
