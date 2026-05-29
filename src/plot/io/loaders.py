@@ -114,6 +114,19 @@ def events_table(pbp_path: str | Path, game_id: int | str) -> pl.DataFrame:
     )
 
 
+def team_info(game: dict) -> dict:
+    """Home/visitor team ids, names, and abbreviations from the game JSON."""
+    ev = game["events"][0]
+    return {
+        "home_id": ev["home"]["teamid"],
+        "home_name": ev["home"]["name"],
+        "home_abbr": ev["home"]["abbreviation"],
+        "visitor_id": ev["visitor"]["teamid"],
+        "visitor_name": ev["visitor"]["name"],
+        "visitor_abbr": ev["visitor"]["abbreviation"],
+    }
+
+
 def load_game(
     game_id: str,
     raw_dir: str | Path = "data/raw",
