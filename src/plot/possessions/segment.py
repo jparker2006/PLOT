@@ -448,15 +448,22 @@ def map_moments_to_possessions(moments: pl.DataFrame, events_with_pid: pl.DataFr
 
 
 def _final_score(events_with_pid: pl.DataFrame) -> tuple[int, int] | None:
-    """Return (a, b) from the last non-null SCORE 'a - b' (orientation not assumed)."""
-    for sc in reversed(events_with_pid["SCORE"].drop_nulls().to_list()):
-        if sc and "-" in str(sc):
-            try:
-                a, b = (int(x) for x in str(sc).split("-"))
-                return a, b
-            except ValueError:
-                continue
-    return None
+    """Return the final (a, b) from SCORE 'a - b' as the row with the MAX cumulative total.
+
+    The SCORE column is occasionally non-monotonic (out-of-order rows near possession boundaries),
+    so the last row by event order is unreliable; the true final is the largest cumulative total.
+    """
+    best, best_total = None, -1
+    for sc in events_with_pid["SCORE"].drop_nulls().to_list():
+        if not sc or "-" not in str(sc):
+            continue
+        try:
+            a, b = (int(x) for x in str(sc).split("-"))
+        except ValueError:
+            continue
+        if a + b > best_total:
+            best, best_total = (a, b), a + b
+    return best
 
 
 def validate_segmentation(events_with_pid: pl.DataFrame, poss: pl.DataFrame, team_info: dict) -> dict:
