@@ -20,6 +20,13 @@ and honest limitations.
 
 > **Status:** early. Built on the only frozen public tracking season (2015-16 SportVU).
 
+## Proof of life (Stage 1)
+
+A possession rebuilt from raw 2015-16 SportVU tracking — 10 players + ball on the court with the
+game/shot clock. The eval bar and per-decision regret overlay come in later stages.
+
+![PLOT Stage-1 proof of life: a LeBron Cavs possession animated from tracking data](docs/proof_of_life.gif)
+
 ## Quickstart
 
 ```bash
