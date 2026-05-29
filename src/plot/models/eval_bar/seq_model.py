@@ -315,6 +315,51 @@ def predict_seq(model: nn.Module, seqs: list[PossessionSeq], *, device: str | No
     return out
 
 
+@torch.no_grad()
+def epv_frame_table(model: nn.Module, seqs: list[PossessionSeq], *, device: str | None = None,
+                    batch_possessions: int = 64, max_frames: int = 100_000) -> pl.DataFrame:
+    """Per-frame EPV trace keyed for the action-value layer: game_id, possession_id, wall_clock_ms, frame_idx, epv.
+
+    Defaults to NO frame cap (``max_frames`` huge) so every action boundary has an EPV — unlike the
+    G1 ``predict_seq``, which caps to mirror training. Used by Stage 3 (``plot.models.action_value``).
+    """
+    device = device or default_device()
+    model.eval()
+    dl = DataLoader(SeqDataset(seqs, max_frames), batch_size=batch_possessions, shuffle=False,
+                    collate_fn=collate)
+    points = torch.arange(N_CLASSES, dtype=torch.float32)
+    cols: dict[str, list] = {k: [] for k in ("game_id", "possession_id", "wall_clock_ms", "frame_idx", "epv")}
+    for batch in dl:
+        bt = _move(batch, device)
+        probs = torch.softmax(model(bt["players"], bt["pmask"], bt["ball"], bt["ctx"]), dim=-1).cpu()
+        epv = (probs * points).sum(-1)                              # [B,T]
+        for i, (gid, pid, n, wall) in enumerate(batch["meta"]):
+            cols["game_id"].extend([gid] * n)
+            cols["possession_id"].extend([pid] * n)
+            cols["wall_clock_ms"].extend(wall[:n].tolist())
+            cols["frame_idx"].extend(range(n))
+            cols["epv"].extend(epv[i, :n].tolist())
+    return pl.DataFrame(cols)
+
+
+def save_model(model: SeqEPV, path) -> None:
+    from pathlib import Path
+    p = Path(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    torch.save(model.state_dict(), str(p))
+
+
+def load_model(path, *, cfg: dict | None = None, device: str | None = None) -> SeqEPV:
+    c = {**_DEFAULTS, **(cfg or {})}
+    device = device or default_device()
+    model = SeqEPV(
+        player_embed_dim=c["player_embed_dim"], frame_embed_dim=c["frame_embed_dim"],
+        gru_hidden=c["gru_hidden"], gru_layers=c["gru_layers"], dropout=c["dropout"],
+    )
+    model.load_state_dict(torch.load(str(path), map_location="cpu"))
+    return model.to(device)
+
+
 _DEFAULTS = {
     "player_embed_dim": 64, "frame_embed_dim": 96, "gru_hidden": 128, "gru_layers": 1,
     "dropout": 0.1, "lr": 1e-3, "weight_decay": 1e-5, "batch_possessions": 64,

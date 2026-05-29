@@ -208,6 +208,24 @@ def build_game_sequences(
     Mirrors :func:`plot.models.eval_bar.dataset.build_game_features` exactly through orientation
     + the backcourt-fraction QC, so a game is clean here iff it is clean in the baseline corpus.
     """
+    cdf, poss, report = build_game_canonical(game_id, raw_dir, pbp_path)
+    if cdf is None:
+        return None, report
+    seqs = sequences_from_canonical(game_id, cdf, poss)
+    report["n_possessions"] = len(seqs)
+    report["n_frames"] = int(sum(s.length for s in seqs))
+    return seqs, report
+
+
+def build_game_canonical(
+    game_id: str, raw_dir: str | Path = "data/raw", pbp_path: str | Path | None = None
+) -> tuple[pl.DataFrame | None, pl.DataFrame, dict]:
+    """Shared per-game intermediate: the canonicalized, de-bleeded ~10 fps long moments + possessions.
+
+    Returns ``(cdf | None, possessions, report)`` — ``cdf`` is None (with status=quarantined in the
+    report) when orientation or the backcourt QC rejects the game. One game-load feeds BOTH the
+    sequence tensors (:func:`sequences_from_canonical`) and the action layer (``plot.possessions.actions``).
+    """
     raw = Path(raw_dir)
     pbp = pbp_path or (raw / "2015-16_pbp.csv")
     game = load_game_json(raw / "json" / f"{game_id}.json")
@@ -221,7 +239,7 @@ def build_game_sequences(
     if orient.quarantined:
         report["status"] = "quarantined"
         report["reason"] = f"orientation:{orient.report.get('reason')}"
-        return None, report
+        return None, poss, report
 
     deduped = dedup_downsample(labeled)
     cdf = canonicalize(deduped, orient.rim_map)
@@ -232,13 +250,14 @@ def build_game_sequences(
     if bc > BACKCOURT_QUARANTINE:
         report["status"] = "quarantined"
         report["reason"] = f"backcourt_fraction={bc:.3f}>{BACKCOURT_QUARANTINE}"
-        return None, report
-
-    seqs = _slice_to_seqs(game_id, _frames_to_arrays(cdf, poss))
+        return None, poss, report
     report["status"] = "ok"
-    report["n_possessions"] = len(seqs)
-    report["n_frames"] = int(sum(s.length for s in seqs))
-    return seqs, report
+    return cdf, poss, report
+
+
+def sequences_from_canonical(game_id: str, cdf: pl.DataFrame, poss: pl.DataFrame) -> list[PossessionSeq]:
+    """Tensorize already-canonicalized long moments into per-possession sequences."""
+    return _slice_to_seqs(game_id, _frames_to_arrays(cdf, poss))
 
 
 # ----- caching (npz under data/processed; gitignored) ---------------------------------------

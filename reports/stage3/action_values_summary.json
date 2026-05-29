@@ -1,0 +1,76 @@
+{
+  "n_actions": 9850,
+  "n_possessions": 1774,
+  "actions_per_possession": 5.55,
+  "by_action_type": [
+    {
+      "action_type": "pass",
+      "n": 8076,
+      "mean_value": -0.0479,
+      "median_value": -0.0177,
+      "std_value": 0.3502
+    },
+    {
+      "action_type": "shot_make",
+      "n": 712,
+      "mean_value": 0.8429,
+      "median_value": 0.8237,
+      "std_value": 0.6456
+    },
+    {
+      "action_type": "shot_miss",
+      "n": 656,
+      "mean_value": -0.4664,
+      "median_value": -0.1742,
+      "std_value": 0.5197
+    },
+    {
+      "action_type": "turnover",
+      "n": 246,
+      "mean_value": -0.5394,
+      "median_value": -0.401,
+      "std_value": 0.4896
+    },
+    {
+      "action_type": "foul_drawn",
+      "n": 145,
+      "mean_value": 0.147,
+      "median_value": 0.2264,
+      "std_value": 0.5511
+    },
+    {
+      "action_type": "control_change",
+      "n": 10,
+      "mean_value": -0.7777,
+      "median_value": -0.7538,
+      "std_value": 0.4769
+    },
+    {
+      "action_type": "period_end",
+      "n": 3,
+      "mean_value": -0.979,
+      "median_value": -1.0928,
+      "std_value": 0.4086
+    },
+    {
+      "action_type": "jump_ball",
+      "n": 2,
+      "mean_value": -0.3355,
+      "median_value": -0.3355,
+      "std_value": 0.0427
+    }
+  ],
+  "overall_mean_value": -0.0219,
+  "decomposition_check": {
+    "n_possessions_checked": 1774,
+    "n_possessions_excluded_trace_gap": 0,
+    "max_abs_residual": 0.0,
+    "mean_abs_residual": 0.0,
+    "n_residual_over_tol": 0,
+    "telescopes": true
+  },
+  "n_games_clean": 10,
+  "n_games_quarantined": 4,
+  "seq_epv_inner_val": "0021500101",
+  "epv_trace": "in-sample (one model on all clean games); Stage 4 will use OOF traces"
+}

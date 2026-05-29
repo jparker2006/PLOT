@@ -52,6 +52,20 @@ uv sync --extra seq                                  # installs torch (MPS/CPU o
 uv run --extra seq python scripts/train_seq_epv_g1.py  # sequence LOGO calibration -> reports/G1_seq/
 ```
 
+## Per-action value (Stage 3)
+
+The eval bar gives expected points at every instant; the **per-action value layer** turns that into
+credit per decision: `value(action) = EPV(end) − EPV(start)` over each on-ball action (a
+"VAEP-for-basketball"). Pinning each possession's terminal action to its realized outcome makes the
+values **telescope exactly** to `realized − initial EPV` (verified on all 1,774 possessions), and the
+credit is sensible — made shots **+0.84**, drawn fouls **+0.15**, passes **≈0**, missed shots
+**−0.47**, turnovers **−0.54** (mean ΔEPV). This is the first decision-sensitive signal; the
+counterfactual + PLOT regret metric build on it next. Report: [`reports/stage3/`](reports/stage3/README.md).
+
+```bash
+uv run --extra seq python scripts/build_action_values.py   # value the actions -> reports/stage3/
+```
+
 ## Quickstart
 
 ```bash
