@@ -106,6 +106,53 @@ uv run --extra seq python scripts/build_oof_epv.py --kfold 5   # leakage-free OO
 uv run --extra seq python scripts/build_plot_g3.py             # PLOT metric + G3 -> reports/G3/
 ```
 
+## Player headline (Stage 6) — Gate G4: PASS
+
+The skeptic's question: *isn't PLOT just shooting efficiency (or volume) relabeled?* G4 correlates
+the per-player headline against the box-score quantities it could be confused for, and pairs that
+with the reliability already shown in G3a. Over **374 of the 380** metric players (matched to
+season-long box stats):
+
+- **Unrelated to efficiency.** Correlation with true-shooting % is **+0.086** (not significant) —
+  PLOT is not a good-shooters metric.
+- **Only weakly tied to usage/volume.** Usage proxy **−0.24**, points/game −0.21, FGA/game −0.24 —
+  a legible *role* pattern (rim-running bigs leave the most on the table; high-usage lead guards the
+  least), but all far below the 0.50 bar. A joint OLS on all four box stats explains just **7.6%**
+  of PLOT's variance — ~92% is information the box score cannot reconstruct.
+- **Reliable.** Split-half **0.51**, Spearman–Brown **0.68** (reused from G3a).
+
+So PLOT is a repeatable signal the box score is structurally blind to — the thesis. It is **new
+information**; whether that information is *decision quality* (vs. role-driven deference) is the
+honest open question, and v1 still scores one decision type. Report: [`reports/G4/`](reports/G4/README.md).
+
+```bash
+uv run python scripts/build_g4.py                              # box stats + G4 -> reports/G4/
+```
+
+## Validity (Stage 6.5) — Gate G5: PASS (with a stated caveat)
+
+G4 showed PLOT is *new* information; G5 asks whether it is *valid* — are the "points left on the
+table" genuinely available, or an artifact of how the inputs are valued? Three checks on the 42-game
+decision set:
+
+- **Inputs calibrated where the metric lives.** On the open pass-up decisions, post-pass EPV matches
+  realized possession points (cal-in-large −0.002, ECE 0.055) and xPoints matches realized makes
+  (ECE 0.040). Positive regret really is value not realized.
+- **Not a finishing-skill artifact.** Rebuilding regret with shooter-aware xPoints (each shot valued
+  at the shooter's own make rate) barely reorders the per-player metric — **Spearman 0.93**.
+- **Selection is bounded, not eliminated.** Players select which open looks to take (propensity AUC
+  0.82) — but the selectors are *distance* and *openness*, exactly xPoints' own features, so the
+  metric conditions on them. The residual threat is selection on **unobservables** (shot difficulty
+  beyond location/openness), which no observational metric can rule out — reported as PLOT's honest
+  ceiling.
+
+So PLOT measures genuinely-left value **conditional on observables**; it does not prove causal
+decision quality (that needs the missing counterfactual). Report: [`reports/G5/`](reports/G5/README.md).
+
+```bash
+uv run --extra seq python scripts/build_g5.py                  # validity checks + G5 -> reports/G5/
+```
+
 ## Quickstart
 
 ```bash

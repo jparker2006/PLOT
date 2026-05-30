@@ -1,0 +1,125 @@
+{
+  "corpus": {
+    "clean_games": 42,
+    "decisions": 24478,
+    "note": "local 42-game corpus; method properties transfer to the 208-game headline"
+  },
+  "thresholds": {
+    "cal_max": 0.05,
+    "ece_max": 0.1,
+    "spearman_min": 0.8,
+    "min_decisions": 15,
+    "near_rim_ft": 10.0,
+    "open_ft": 4.0
+  },
+  "G5a_calibration": {
+    "post_pass_epv_vs_realized": {
+      "n": 24478,
+      "mean_pred": 0.9714,
+      "mean_realized": 0.9734,
+      "cal_in_large": -0.002,
+      "slope": 0.9554,
+      "ece": 0.055
+    },
+    "post_pass_epv_near_rim": {
+      "n": 1478,
+      "mean_pred": 1.1415,
+      "mean_realized": 1.1015,
+      "cal_in_large": 0.04,
+      "slope": 0.9401,
+      "ece": 0.0675
+    },
+    "xpoints_make_vs_made": {
+      "n": 2403,
+      "mean_pred": 0.4347,
+      "mean_realized": 0.444,
+      "cal_in_large": -0.0093,
+      "slope": 1.0649,
+      "ece": 0.0402
+    },
+    "xpoints_make_near_rim": {
+      "n": 297,
+      "mean_pred": 0.586,
+      "mean_realized": 0.6498,
+      "cal_in_large": -0.0638,
+      "slope": 3.5923,
+      "ece": 0.1684
+    },
+    "gate": {
+      "per_leg": {
+        "post_pass_epv_vs_realized": true,
+        "xpoints_make_vs_made": true
+      },
+      "pass": true,
+      "cal_max": 0.05,
+      "ece_max": 0.1
+    }
+  },
+  "G5b_selection_bound": {
+    "league_2p": 0.4907,
+    "league_3p": 0.3548,
+    "n_taken": 2403,
+    "n_passed": 24478,
+    "feature_smd_taken_minus_passed": {
+      "dist_to_rim": -1.0036,
+      "nearest_def_dist": -0.9209,
+      "three_pt": 0.1127
+    },
+    "propensity_auc": 0.8191,
+    "taken_open_make_rate_by_value_bin": [
+      {
+        "bin": 0,
+        "n": 481,
+        "mean_open_xpoints": 0.8043,
+        "empirical_make_rate": 0.3472
+      },
+      {
+        "bin": 1,
+        "n": 480,
+        "mean_open_xpoints": 0.9408,
+        "empirical_make_rate": 0.4792
+      },
+      {
+        "bin": 2,
+        "n": 481,
+        "mean_open_xpoints": 1.0659,
+        "empirical_make_rate": 0.4116
+      },
+      {
+        "bin": 3,
+        "n": 480,
+        "mean_open_xpoints": 1.1122,
+        "empirical_make_rate": 0.4125
+      },
+      {
+        "bin": 4,
+        "n": 481,
+        "mean_open_xpoints": 1.2161,
+        "empirical_make_rate": 0.5696
+      }
+    ]
+  },
+  "G5c_ordering_robustness": {
+    "shrink_k2": 200.0,
+    "shrink_k3": 100.0,
+    "n_players": 301,
+    "value_col": "mean_regret_clipped",
+    "pearson_r": 0.9387,
+    "spearman_r": 0.9249,
+    "top_k": 30,
+    "top_k_overlap": 0.8
+  },
+  "G5_gate": {
+    "inputs_calibrated_in_subspace": true,
+    "ordering_robust_to_finishing": true
+  },
+  "G5_pass": true,
+  "G5_gate_detail": {
+    "gate": {
+      "inputs_calibrated_in_subspace": true,
+      "ordering_robust_to_finishing": true
+    },
+    "spearman_min": 0.8,
+    "pass": true
+  }
+}

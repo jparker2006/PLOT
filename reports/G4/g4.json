@@ -1,0 +1,283 @@
+{
+  "thresholds": {
+    "corr_max": 0.5,
+    "reliability_min": 0.6,
+    "min_fga_fta": 50,
+    "gate_stats": [
+      "ts_pct",
+      "usg_proxy_pg"
+    ]
+  },
+  "n_players_plot": 380,
+  "n_players_box": 423,
+  "n_players_matched": 374,
+  "plot_col": "plot_per100_clipped",
+  "reliability": {
+    "source": "G3(a), reused (not recomputed)",
+    "split_half_pearson": 0.5142,
+    "spearman_brown_full": 0.6792
+  },
+  "incremental_info_clipped": {
+    "ts_pct": {
+      "n": 374,
+      "pearson_r": 0.0858,
+      "pearson_p": 0.097696,
+      "spearman_r": 0.0665,
+      "spearman_p": 0.199623
+    },
+    "usg_proxy_pg": {
+      "n": 374,
+      "pearson_r": -0.2391,
+      "pearson_p": 3e-06,
+      "spearman_r": -0.1936,
+      "spearman_p": 0.000165
+    },
+    "pts_pg": {
+      "n": 374,
+      "pearson_r": -0.2141,
+      "pearson_p": 3e-05,
+      "spearman_r": -0.1666,
+      "spearman_p": 0.001224
+    },
+    "fga_pg": {
+      "n": 374,
+      "pearson_r": -0.2353,
+      "pearson_p": 4e-06,
+      "spearman_r": -0.1894,
+      "spearman_p": 0.000229
+    }
+  },
+  "incremental_info_signed": {
+    "ts_pct": {
+      "n": 374,
+      "pearson_r": 0.0218,
+      "pearson_p": 0.673739,
+      "spearman_r": 0.0096,
+      "spearman_p": 0.853461
+    },
+    "usg_proxy_pg": {
+      "n": 374,
+      "pearson_r": -0.3396,
+      "pearson_p": 0.0,
+      "spearman_r": -0.3389,
+      "spearman_p": 0.0
+    },
+    "pts_pg": {
+      "n": 374,
+      "pearson_r": -0.3195,
+      "pearson_p": 0.0,
+      "spearman_r": -0.3141,
+      "spearman_p": 0.0
+    },
+    "fga_pg": {
+      "n": 374,
+      "pearson_r": -0.324,
+      "pearson_p": 0.0,
+      "spearman_r": -0.3215,
+      "spearman_p": 0.0
+    }
+  },
+  "variance_explained_gated": {
+    "n": 374,
+    "predictors": [
+      "ts_pct",
+      "usg_proxy_pg"
+    ],
+    "r2": 0.0746,
+    "adj_r2": 0.0697
+  },
+  "variance_explained_all": {
+    "n": 374,
+    "predictors": [
+      "ts_pct",
+      "usg_proxy_pg",
+      "pts_pg",
+      "fga_pg"
+    ],
+    "r2": 0.0758,
+    "adj_r2": 0.0658
+  },
+  "headline_leaderboard_top10": [
+    {
+      "player_id": 203101,
+      "player_name": "Miles Plumlee",
+      "n_decisions": 59,
+      "plot_per100_clipped": 43.78832466696658,
+      "ts_pct": 0.6062712388013594,
+      "usg_proxy_pg": 5.067118644067796
+    },
+    {
+      "player_id": 1626149,
+      "player_name": "Montrezl Harrell",
+      "n_decisions": 49,
+      "plot_per100_clipped": 38.67255951089197,
+      "ts_pct": 0.634978229317852,
+      "usg_proxy_pg": 3.7423529411764704
+    },
+    {
+      "player_id": 2406,
+      "player_name": "Caron Butler",
+      "n_decisions": 40,
+      "plot_per100_clipped": 38.28869832139713,
+      "ts_pct": 0.49004355942750466,
+      "usg_proxy_pg": 4.205
+    },
+    {
+      "player_id": 201585,
+      "player_name": "Kosta Koufos",
+      "n_decisions": 251,
+      "plot_per100_clipped": 37.60670644468636,
+      "ts_pct": 0.5400604377654361,
+      "usg_proxy_pg": 6.894358974358974
+    },
+    {
+      "player_id": 1626161,
+      "player_name": "Willie Cauley-Stein",
+      "n_decisions": 125,
+      "plot_per100_clipped": 35.919341822132125,
+      "ts_pct": 0.5875634517766497,
+      "usg_proxy_pg": 6.666666666666667
+    },
+    {
+      "player_id": 201601,
+      "player_name": "Luc Mbah a Moute",
+      "n_decisions": 100,
+      "plot_per100_clipped": 34.92595030792722,
+      "ts_pct": 0.49767321613236815,
+      "usg_proxy_pg": 3.5956756756756763
+    },
+    {
+      "player_id": 203524,
+      "player_name": "Solomon Hill",
+      "n_decisions": 43,
+      "plot_per100_clipped": 31.540237967348357,
+      "ts_pct": 0.5430943129636171,
+      "usg_proxy_pg": 4.99
+    },
+    {
+      "player_id": 203940,
+      "player_name": "Adreian Payne",
+      "n_decisions": 91,
+      "plot_per100_clipped": 30.430138677593497,
+      "ts_pct": 0.42188698542572234,
+      "usg_proxy_pg": 3.8487999999999998
+    },
+    {
+      "player_id": 202355,
+      "player_name": "Hassan Whiteside",
+      "n_decisions": 239,
+      "plot_per100_clipped": 30.026178958646128,
+      "ts_pct": 0.6289612463109003,
+      "usg_proxy_pg": 13.202191780821918
+    },
+    {
+      "player_id": 203530,
+      "player_name": "Joffrey Lauvergne",
+      "n_decisions": 174,
+      "plot_per100_clipped": 29.916327618830124,
+      "ts_pct": 0.5665756896383662,
+      "usg_proxy_pg": 7.870508474576272
+    }
+  ],
+  "headline_leaderboard_bottom10": [
+    {
+      "player_id": 201196,
+      "player_name": "Ramon Sessions",
+      "n_decisions": 313,
+      "plot_per100_clipped": 6.101181373829007,
+      "ts_pct": 0.5652319544464914,
+      "usg_proxy_pg": 10.140487804878049
+    },
+    {
+      "player_id": 201578,
+      "player_name": "Marreese Speights",
+      "n_decisions": 119,
+      "plot_per100_clipped": 5.717454470204992,
+      "ts_pct": 0.5057689268215584,
+      "usg_proxy_pg": 8.058591549295775
+    },
+    {
+      "player_id": 203078,
+      "player_name": "Bradley Beal",
+      "n_decisions": 478,
+      "plot_per100_clipped": 5.507588465187214,
+      "ts_pct": 0.5465291406143032,
+      "usg_proxy_pg": 17.971636363636364
+    },
+    {
+      "player_id": 201142,
+      "player_name": "Kevin Durant",
+      "n_decisions": 355,
+      "plot_per100_clipped": 5.363326851875961,
+      "ts_pct": 0.6340149488788341,
+      "usg_proxy_pg": 25.696111111111108
+    },
+    {
+      "player_id": 203462,
+      "player_name": "Archie Goodwin",
+      "n_decisions": 32,
+      "plot_per100_clipped": 5.311816718714847,
+      "ts_pct": 0.4981062100528683,
+      "usg_proxy_pg": 10.647719298245615
+    },
+    {
+      "player_id": 201571,
+      "player_name": "D.J. Augustin",
+      "n_decisions": 274,
+      "plot_per100_clipped": 5.308514315660336,
+      "ts_pct": 0.574670210671392,
+      "usg_proxy_pg": 7.908387096774193
+    },
+    {
+      "player_id": 203148,
+      "player_name": "Brian Roberts",
+      "n_decisions": 117,
+      "plot_per100_clipped": 4.8461019891047865,
+      "ts_pct": 0.5520249892287806,
+      "usg_proxy_pg": 4.3475
+    },
+    {
+      "player_id": 201566,
+      "player_name": "Russell Westbrook",
+      "n_decisions": 718,
+      "plot_per100_clipped": 4.716337785783303,
+      "ts_pct": 0.553911279862274,
+      "usg_proxy_pg": 25.476499999999998
+    },
+    {
+      "player_id": 2403,
+      "player_name": "Nene",
+      "n_decisions": 43,
+      "plot_per100_clipped": 3.7644154831144276,
+      "ts_pct": 0.5640309411259132,
+      "usg_proxy_pg": 9.498245614035087
+    },
+    {
+      "player_id": 202322,
+      "player_name": "John Wall",
+      "n_decisions": 811,
+      "plot_per100_clipped": 3.611672172444385,
+      "ts_pct": 0.5105441360740088,
+      "usg_proxy_pg": 23.615064935064936
+    }
+  ],
+  "G4_gate": {
+    "incremental_info": true,
+    "reliable": true
+  },
+  "G4_pass": true,
+  "G4_gate_detail": {
+    "per_stat_below_corr_max": {
+      "ts_pct": true,
+      "usg_proxy_pg": true
+    },
+    "corr_max": 0.5,
+    "reliability_sb": 0.6792,
+    "reliability_min": 0.6,
+    "gate": {
+      "incremental_info": true,
+      "reliable": true
+    },
+    "pass": true
+  }
+}
