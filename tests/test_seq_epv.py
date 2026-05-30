@@ -194,6 +194,26 @@ def test_cap_seq_bounds_corpus_memory():
     assert cap_seq(_toy_seq(50, 1, seed=4), 640).length == 50               # short passes through
 
 
+def test_load_cache_copies_and_caps(tmp_path):
+    # Regression for the corpus-load OOM: _load_cache must store COPIES (not numpy views) of capped
+    # slices, so a short possession's slice can't pin the whole game's array (monster possessions
+    # included) and balloon the resident corpus at scale.
+    from plot.models.eval_bar.seq_dataset import _load_cache, _save_cache
+
+    short = _toy_seq(50, 1, seed=1)
+    short.possession_id = 1
+    monster = _toy_seq(5000, 2, seed=2)   # artifact possession
+    monster.possession_id = 2
+    p = tmp_path / "g_seq.npz"
+    _save_cache(p, [short, monster], 0.1)
+    seqs, bc = _load_cache(p)
+    assert abs(bc - 0.1) < 1e-9
+    by = {s.possession_id: s for s in seqs}
+    assert by[1].length == 50 and by[2].length == 640          # monster capped to last 640 on load
+    for s in seqs:                                             # every array is an owned copy, no view
+        assert s.players.base is None and s.ball.base is None and s.wall_ms.base is None
+
+
 def test_tiny_training_runs_and_improves():
     pytest.importorskip("torch")
     from plot.eval.calibration import multiclass_logloss

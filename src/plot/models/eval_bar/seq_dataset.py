@@ -308,14 +308,25 @@ def _save_cache(path: Path, seqs: list[PossessionSeq], bc: float) -> None:
 def _load_cache(path: Path) -> tuple[list[PossessionSeq], float]:
     z = np.load(path, allow_pickle=False)
     gid = str(z["game_id"])
+    # Materialize each flat array ONCE, then store COPIES of capped per-possession slices. Slicing
+    # without copying (the old code) left every PossessionSeq as a numpy VIEW into the full per-game
+    # array, so a single short possession's view pinned the whole array (monster boundary-merge
+    # possessions included) in RAM — the corpus then retained every game's full uncapped array and
+    # OOM'd at scale regardless of cap_seq. Copying the capped slice frees the full arrays on return.
+    players, pmask, ball = z["players"], z["pmask"], z["ball"]
+    ctx, wall = z["ctx"], z["wall_ms"]
     seqs = []
     for pid, s, e, lab in zip(z["poss_id"], z["starts"], z["ends"], z["labels"], strict=True):
+        lo = int(e) - min(int(e) - int(s), CORPUS_MAX_FRAMES)   # keep only the last CORPUS_MAX_FRAMES
+        e = int(e)
         seqs.append(PossessionSeq(
             game_id=gid, possession_id=int(pid),
-            players=z["players"][s:e], pmask=z["pmask"][s:e], ball=z["ball"][s:e], ctx=z["ctx"][s:e],
-            label=int(lab), wall_ms=z["wall_ms"][s:e],
+            players=players[lo:e].copy(), pmask=pmask[lo:e].copy(), ball=ball[lo:e].copy(),
+            ctx=ctx[lo:e].copy(), label=int(lab), wall_ms=wall[lo:e].copy(),
         ))
-    return seqs, float(z["backcourt_fraction"])
+    bc = float(z["backcourt_fraction"])
+    z.close()
+    return seqs, bc
 
 
 def build_sequence_corpus(
