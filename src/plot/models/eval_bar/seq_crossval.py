@@ -9,11 +9,32 @@ score both models on the same footing.
 
 from __future__ import annotations
 
+import gc
+import resource
+
 import polars as pl
 
 from plot.models.eval_bar.folds import inner_val_game
 from plot.models.eval_bar.seq_dataset import PossessionSeq
 from plot.models.eval_bar.seq_model import epv_frame_table, predict_seq, train_seq
+
+
+def _rss_gb() -> float:
+    """Peak resident memory in GB (ru_maxrss is KB on Linux) — for leak diagnosis at scale."""
+    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1_048_576
+
+
+def _free(*objs) -> None:
+    """Drop references + force a GC sweep (and release the torch CUDA cache) between folds, so a
+    large corpus's per-fold model/optimizer/activation memory cannot accumulate fold-over-fold."""
+    del objs
+    gc.collect()
+    try:
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    except Exception:
+        pass
 
 
 def run_logo_seq(
@@ -128,9 +149,15 @@ def run_kfold_epv_traces(
         fit_seqs = [s for g in train_ids if g != val_id for s in corpus[g]]
         val_seqs = corpus[val_id] if val_id else None
         if verbose:
-            print(f"  kfold {fi + 1}/{len(groups)} held={held_group} val={val_id} fit_poss={len(fit_seqs)}")
+            print(f"  kfold {fi + 1}/{len(groups)} held={held_group} val={val_id} "
+                  f"fit_poss={len(fit_seqs)} | RSS {_rss_gb():.1f}GB", flush=True)
         model, _ = train_seq(fit_seqs, val_seqs, cfg=cfg, device=device, seed=seed, verbose=verbose)
+        if verbose:
+            print(f"  kfold {fi + 1}/{len(groups)} trained | RSS {_rss_gb():.1f}GB", flush=True)
         for g in held_group:
             parts.append(epv_frame_table(model, corpus[g], device=device,
                                          batch_possessions=batch, max_frames=trace_cap))
+        _free(model, fit_seqs)
+        if verbose:
+            print(f"  kfold {fi + 1}/{len(groups)} traced+freed | RSS {_rss_gb():.1f}GB", flush=True)
     return pl.concat(parts) if parts else pl.DataFrame()
