@@ -1,0 +1,89 @@
+:root {
+  --bg: #0f1419;
+  --panel: #1a2230;
+  --panel-2: #232d3f;
+  --ink: #e6edf3;
+  --muted: #8b98a9;
+  --line: #2d3a4d;
+  --accent: #4aa3df;
+
+  --great: #1aa06d;
+  --good: #6fbf73;
+  --inaccuracy: #e2b53e;
+  --mistake: #e08a3c;
+  --blunder: #d6453d;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 22px 20px 60px; }
+
+.title { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.title h1 { font-size: 26px; margin: 0; letter-spacing: -0.4px; }
+.title .tag { color: var(--muted); font-size: 14px; }
+
+.controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 16px 0; }
+.controls select, .controls button {
+  background: var(--panel-2); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 12px; font-size: 14px; cursor: pointer;
+}
+.controls button:hover { border-color: var(--accent); }
+.controls .play { background: var(--accent); border-color: var(--accent); color: #06121c; font-weight: 600; min-width: 84px; }
+
+.stage { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+@media (max-width: 940px) { .stage { grid-template-columns: 1fr; } }
+
+.courtcard { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.courtrow { display: flex; gap: 12px; align-items: stretch; }
+.courtrow .court { flex: 1; min-width: 0; }
+.courtcard canvas { width: 100%; height: auto; display: block; border-radius: 8px; }
+
+.evalbar { width: 40px; display: flex; flex-direction: column; align-items: center; }
+.evalbar .track { position: relative; flex: 1; width: 22px; background: #0c1118; border: 1px solid var(--line); border-radius: 11px; overflow: hidden; }
+.evalbar .fill { position: absolute; bottom: 0; left: 0; right: 0; transition: height 80ms linear, background 120ms linear; }
+.evalbar .mid { position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed #3a4a60; }
+.evalbar .val { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--ink); margin-bottom: 6px; font-weight: 700; }
+.evalbar .cap { font-size: 10px; color: var(--muted); margin-top: 6px; }
+
+.scrub { margin-top: 12px; }
+.scrub input[type=range] { width: 100%; accent-color: var(--accent); }
+.scrub .clock { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.panel h3 { margin: 0 0 10px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; }
+
+.poss-meta { font-size: 13px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+.poss-meta b { color: var(--ink); }
+
+.declist { display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto; }
+.decrow { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 8px; background: var(--panel-2); border: 1px solid transparent; cursor: pointer; }
+.decrow:hover { border-color: var(--line); }
+.decrow.active { border-color: var(--accent); background: #1d2b3a; }
+.decrow .who { flex: 1; font-size: 13px; }
+.decrow .who .sub { color: var(--muted); font-size: 11px; }
+.decrow .pts { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); }
+
+.badge { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; color: #06121c; white-space: nowrap; }
+.badge.great { background: var(--great); color: #fff; }
+.badge.good { background: var(--good); }
+.badge.inaccuracy { background: var(--inaccuracy); }
+.badge.mistake { background: var(--mistake); }
+.badge.blunder { background: var(--blunder); color: #fff; }
+
+.callout { margin-top: 12px; min-height: 54px; padding: 10px 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); font-size: 13px; line-height: 1.5; }
+.callout.empty { color: var(--muted); }
+
+.legend { margin-top: 18px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.legend .badge { margin-right: 4px; }
+.foot { margin-top: 28px; color: var(--muted); font-size: 12px; line-height: 1.6; border-top: 1px solid var(--line); padding-top: 14px; }

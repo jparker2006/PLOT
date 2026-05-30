@@ -1,0 +1,26 @@
+[
+  {
+    "game_id": "0021500308",
+    "matchup": "LAL @ TOR",
+    "n_possessions": 12,
+    "badge_counts": {
+      "great": 13,
+      "good": 15,
+      "inaccuracy": 7,
+      "mistake": 8,
+      "blunder": 15
+    }
+  },
+  {
+    "game_id": "0021500203",
+    "matchup": "ORL @ CLE",
+    "n_possessions": 12,
+    "badge_counts": {
+      "great": 6,
+      "good": 23,
+      "inaccuracy": 8,
+      "mistake": 8,
+      "blunder": 14
+    }
+  }
+]

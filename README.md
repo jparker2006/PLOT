@@ -153,6 +153,18 @@ decision quality (that needs the missing counterfactual). Report: [`reports/G5/`
 uv run --extra seq python scripts/build_g5.py                  # validity checks + G5 -> reports/G5/
 ```
 
+## Live demo (Stage 7)
+
+A **chess.com-style possession review** in Next.js: an animated court, the **eval bar** (per-frame
+EPV) rising and falling, and **decision badges** on each open ball-handler pass-up — great / good /
+inaccuracy / mistake / blunder, tiered on *points left on the table*. Everything is precomputed
+static JSON; **no model runs in the browser**. See [`web/`](web/README.md).
+
+```bash
+uv run --extra seq python scripts/export_demo_json.py --games 0021500308 0021500203  # -> web/public/demo/
+cd web && npm install && npm run dev                           # http://localhost:3000
+```
+
 ## Quickstart
 
 ```bash
