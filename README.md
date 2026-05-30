@@ -66,6 +66,22 @@ counterfactual + PLOT regret metric build on it next. Report: [`reports/stage3/`
 uv run --extra seq python scripts/build_action_values.py   # value the actions -> reports/stage3/
 ```
 
+## Counterfactual + regret (Stage 4) — Gate G2: PASS
+
+The crux. **Decision regret** = `xPoints(best available open shot) − value(chosen action)` is only
+meaningful if its inputs are calibrated one step ahead. **xPoints** (expected points of shooting now,
+a logistic fit on real shots) is well-calibrated on held-out games — cal-in-large **+0.002**, ECE
+**0.077**, and it beats the base make-rate. The **post-pass EPV** that scores a chosen pass (from the
+leakage-free out-of-fold trace, isotonic-recalibrated) is calibrated too — cal-in-large **−0.014**,
+ECE **0.066**. So regret rests on honest inputs, not an artifact. A v1 narrow regret (open-shot vs
+post-pass EPV) is demonstrated over 5,525 decisions; the per-player metric + stability gate are next.
+Report: [`reports/G2/`](reports/G2/README.md).
+
+```bash
+uv run --extra seq python scripts/build_oof_epv.py       # leakage-free OOF EPV trace
+uv run --extra seq python scripts/train_xpoints_g2.py    # xPoints + G2 -> reports/G2/
+```
+
 ## Quickstart
 
 ```bash

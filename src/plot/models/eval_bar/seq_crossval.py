@@ -13,7 +13,7 @@ import polars as pl
 
 from plot.models.eval_bar.folds import inner_val_game
 from plot.models.eval_bar.seq_dataset import PossessionSeq
-from plot.models.eval_bar.seq_model import predict_seq, train_seq
+from plot.models.eval_bar.seq_model import epv_frame_table, predict_seq, train_seq
 
 
 def run_logo_seq(
@@ -50,3 +50,34 @@ def run_logo_seq(
         })
     oof = pl.concat(oof_parts) if oof_parts else pl.DataFrame()
     return {"oof": oof, "folds": folds, "games": games}
+
+
+def run_logo_epv_traces(
+    corpus: dict[str, list[PossessionSeq]],
+    game_ids: list[str] | None = None,
+    *,
+    cfg: dict | None = None,
+    device: str | None = None,
+    seed: int = 1729,
+    verbose: bool = False,
+) -> pl.DataFrame:
+    """Leakage-free per-frame OOF EPV trace, keyed game_id/possession_id/wall_clock_ms/frame_idx/epv.
+
+    Same LOGO protocol as ``run_logo_seq`` but each held-out game is scored with the UNCAPPED
+    frame-keyed ``epv_frame_table`` (every frame gets an EPV), by a model that never saw it. This is
+    the leakage-free EPV trace Stage 4 (post-pass calibration + regret) consumes — distinct from the
+    capped, weighted G1 OOF.
+    """
+    games = game_ids or sorted(corpus.keys())
+    batch = int((cfg or {}).get("batch_possessions", 64))
+    parts = []
+    for held in games:
+        train_ids = [g for g in games if g != held]
+        val_id = inner_val_game(train_ids, held) if len(train_ids) > 1 else None
+        fit_seqs = [s for g in train_ids if g != val_id for s in corpus[g]]
+        val_seqs = corpus[val_id] if val_id else None
+        if verbose:
+            print(f"  trace fold held={held} val={val_id} fit_poss={len(fit_seqs)}")
+        model, _ = train_seq(fit_seqs, val_seqs, cfg=cfg, device=device, seed=seed, verbose=verbose)
+        parts.append(epv_frame_table(model, corpus[held], device=device, batch_possessions=batch))
+    return pl.concat(parts) if parts else pl.DataFrame()

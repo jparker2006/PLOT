@@ -1,0 +1,160 @@
+{
+  "n_games_clean": 10,
+  "n_games_quarantined": 4,
+  "epv_recalibrated": true,
+  "xpoints": {
+    "n_shots": 1233,
+    "make_rate": 0.4566,
+    "calibration_in_the_large": 0.0018838375838057253,
+    "mean_xpoints": 1.0183919126189518,
+    "mean_fg_points": 1.0202757502027575,
+    "slope": 0.8416600450709861,
+    "ece_points": 0.07687317736999784,
+    "mce_points": 0.23868140096790125,
+    "p_make_logloss": 0.6685,
+    "p_make_logloss_baseline": 0.6894,
+    "p_make_brier": 0.2381,
+    "p_make_brier_baseline": 0.2481,
+    "reliability_bins": [
+      {
+        "bin": 0,
+        "pred_mean": 0.674757942924488,
+        "obs_mean": 0.7012987012987013,
+        "weight": 154.0,
+        "count": 154
+      },
+      {
+        "bin": 1,
+        "pred_mean": 0.82377717963531,
+        "obs_mean": 0.8831168831168831,
+        "weight": 154.0,
+        "count": 154
+      },
+      {
+        "bin": 2,
+        "pred_mean": 0.9154979584449852,
+        "obs_mean": 0.9090909090909091,
+        "weight": 154.0,
+        "count": 154
+      },
+      {
+        "bin": 3,
+        "pred_mean": 0.9845287056097662,
+        "obs_mean": 0.9545454545454546,
+        "weight": 154.0,
+        "count": 154
+      },
+      {
+        "bin": 4,
+        "pred_mean": 1.048841233674546,
+        "obs_mean": 1.0129870129870129,
+        "weight": 154.0,
+        "count": 154
+      },
+      {
+        "bin": 5,
+        "pred_mean": 1.108922317545363,
+        "obs_mean": 1.0454545454545454,
+        "weight": 154.0,
+        "count": 154
+      },
+      {
+        "bin": 6,
+        "pred_mean": 1.178997728798555,
+        "obs_mean": 1.2532467532467533,
+        "weight": 154.0,
+        "count": 154
+      },
+      {
+        "bin": 7,
+        "pred_mean": 1.4092740386947316,
+        "obs_mean": 1.4,
+        "weight": 155.0,
+        "count": 155
+      }
+    ]
+  },
+  "post_pass_epv": {
+    "n_post_pass_states": 8076,
+    "calibration_in_the_large": -0.014321070064693298,
+    "mean_post_pass_epv": 0.9696207233584031,
+    "mean_realized": 0.9552996532937098,
+    "slope": 0.9149621517533908,
+    "ece_points": 0.06604711778579522,
+    "mce_points": 0.16597803171477232,
+    "reliability_bins": [
+      {
+        "bin": 0,
+        "pred_mean": 0.0392959536250444,
+        "obs_mean": 0.02034587995930824,
+        "weight": 983.0,
+        "count": 983
+      },
+      {
+        "bin": 1,
+        "pred_mean": 0.5370906537740633,
+        "obs_mean": 0.6511627906976745,
+        "weight": 1032.0,
+        "count": 1032
+      },
+      {
+        "bin": 2,
+        "pred_mean": 0.992562586418925,
+        "obs_mean": 1.0317145688800793,
+        "weight": 1009.0,
+        "count": 1009
+      },
+      {
+        "bin": 3,
+        "pred_mean": 1.0236388293903051,
+        "obs_mean": 0.9732620320855615,
+        "weight": 935.0,
+        "count": 935
+      },
+      {
+        "bin": 4,
+        "pred_mean": 1.0328665340830057,
+        "obs_mean": 1.0964360587002095,
+        "weight": 954.0,
+        "count": 954
+      },
+      {
+        "bin": 5,
+        "pred_mean": 1.0703483613062963,
+        "obs_mean": 1.0134892086330936,
+        "weight": 1112.0,
+        "count": 1112
+      },
+      {
+        "bin": 6,
+        "pred_mean": 1.2219994911301857,
+        "obs_mean": 1.1679611650485437,
+        "weight": 1030.0,
+        "count": 1030
+      },
+      {
+        "bin": 7,
+        "pred_mean": 1.8069657222386886,
+        "obs_mean": 1.6611165523996083,
+        "weight": 1021.0,
+        "count": 1021
+      }
+    ]
+  },
+  "regret_demo": {
+    "n_decisions": 5525,
+    "n_players": 159,
+    "mean_regret_clipped": 0.0748,
+    "mean_regret_signed": -0.2632,
+    "median_regret_signed": -0.1536,
+    "frac_positive_regret": 0.2787,
+    "p90_regret_clipped": 0.2092,
+    "max_regret_clipped": 1.3333
+  },
+  "G2_gate": {
+    "xpoints_calibrated": true,
+    "xpoints_beats_baseline": true,
+    "post_pass_epv_calibrated": true
+  },
+  "G2_pass": true
+}
