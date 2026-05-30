@@ -180,6 +180,20 @@ def test_epv_frame_table_caps_pathological_possession():
     assert wm[0] == 5000 - 640 and wm[-1] == 4999   # kept frames are the most recent
 
 
+def test_cap_seq_bounds_corpus_memory():
+    # Regression: build_sequence_corpus holds the whole corpus in RAM; an artifact possession of
+    # thousands of frames (compresses ~40x on disk, explodes decompressed) must be capped on load,
+    # and the slice COPIED so the giant base array is freed (a view would keep it alive -> OOM).
+    from plot.models.eval_bar.seq_dataset import cap_seq
+
+    long = _toy_seq(5000, 2, seed=3)
+    capped = cap_seq(long, 640)
+    assert capped.length == 640
+    assert capped.wall_ms[0] == 5000 - 640 and capped.wall_ms[-1] == 4999   # most-recent frames
+    assert capped.players.base is None and capped.ball.base is None         # copies, not views
+    assert cap_seq(_toy_seq(50, 1, seed=4), 640).length == 50               # short passes through
+
+
 def test_tiny_training_runs_and_improves():
     pytest.importorskip("torch")
     from plot.eval.calibration import multiclass_logloss

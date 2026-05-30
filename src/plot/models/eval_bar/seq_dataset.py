@@ -50,6 +50,14 @@ CONTEXT_FEATURES = [
 N_PLAYER_SLOTS = 10
 N_CLASSES = 4
 
+# Bound each possession's STORED length when assembling the corpus. Boundary-merge segmentation
+# artifacts can run to thousands of near-identical frames; they compress ~40x on disk (tiny npz) but
+# explode in RAM when decompressed, so an uncapped corpus OOMs at scale (208 games -> >125GB). Capping
+# to the last CORPUS_MAX_FRAMES is lossless for every consumer: training uses the last 320, the OOF
+# trace the last 640, and real possessions (<= ~40s) are far shorter. We COPY the slice so the giant
+# base array is released (a numpy view would keep it alive).
+CORPUS_MAX_FRAMES = 640
+
 # fixed physical normalization scales (leakage-free, reproducible — never fit to data)
 _X_C, _X_S = 47.0, 47.0          # center at half court; +/-1 spans the length
 _Y_C, _Y_S = 25.0, 25.0
@@ -82,6 +90,20 @@ class PossessionSeq:
     @property
     def weight_per_frame(self) -> float:
         return 1.0 / self.length
+
+
+def cap_seq(s: PossessionSeq, max_len: int = CORPUS_MAX_FRAMES) -> PossessionSeq:
+    """Truncate a possession to its most-recent ``max_len`` frames, COPYING the slices so the
+    original (possibly giant, artifact) base arrays can be freed. Shorter possessions pass through."""
+    if s.length <= max_len:
+        return s
+    sl = slice(s.length - max_len, s.length)
+    return PossessionSeq(
+        game_id=s.game_id, possession_id=s.possession_id,
+        players=s.players[sl].copy(), pmask=s.pmask[sl].copy(),
+        ball=s.ball[sl].copy(), ctx=s.ctx[sl].copy(),
+        label=s.label, wall_ms=s.wall_ms[sl].copy(),
+    )
 
 
 def _frames_to_arrays(cdf: pl.DataFrame, possessions: pl.DataFrame) -> tuple[np.ndarray, ...]:
@@ -321,6 +343,7 @@ def build_sequence_corpus(
                 reports.append({"game_id": gid, "status": "quarantined", "cached": True,
                                 "reason": f"backcourt_fraction={bc:.3f}>{BACKCOURT_QUARANTINE}"})
                 continue
+            seqs = [cap_seq(s) for s in seqs]  # bound RAM (artifact possessions); frees giant bases
             corpus[gid] = seqs
             reports.append({"game_id": gid, "status": "ok", "cached": True, "n_possessions": len(seqs),
                             "n_frames": int(sum(s.length for s in seqs)), "backcourt_fraction": round(bc, 4)})
@@ -328,6 +351,7 @@ def build_sequence_corpus(
         seqs, rep = build_game_sequences(gid, raw_dir, pbp_path)
         reports.append(rep)
         if seqs is not None:
+            seqs = [cap_seq(s) for s in seqs]
             corpus[gid] = seqs
             if cpath:
                 _save_cache(cpath, seqs, rep["backcourt_fraction"])
