@@ -87,22 +87,22 @@ uv run --extra seq python scripts/train_xpoints_g2.py    # xPoints + G2 -> repor
 The flagship. Per-decision regret is aggregated to a per-player **points left on the table / 100
 decisions**, and G3 asks the two questions that decide whether that number is real: does it **repeat**
 (a skill, not noise) and is it **distinct from finishing** (a decision property, not shot-making)?
-On **24,478 open pass-up decisions across 42 games** (249 players in the metric), both hold:
+On **124,953 open pass-up decisions across 208 games** (380 players in the metric), both hold:
 
 - **Stable across the season.** Split the games odd/even, aggregate per player, correlate: split-half
-  Pearson **0.384** (p=2e-6), Spearman–Brown full-sample reliability **0.55** — moderate but decisively
-  repeatable for a behavioral metric on a half-season.
+  Pearson **0.514**, Spearman–Brown full-sample reliability **0.68** — a solid, decisively repeatable
+  signal (up from 0.38 / SB 0.55 on the first 42-game pass — scaling the corpus tightened it).
 - **A decision, not just location.** Player fixed effects are jointly significant *beyond* a full
-  shot-location model — F(249, 24224) = **3.35, p≈0**.
-- **A decision, not finishing.** Per-player regret is orthogonal to finishing skill (xPoints uses a
-  population make model): correlation **−0.037** (p=0.62).
+  shot-location model — F(380, 124568) = **4.96, p≈0**.
+- **A decision, not finishing.** Per-player regret is only weakly related to finishing skill (xPoints
+  uses a population make model): correlation **−0.17** — well short of being a finishing proxy.
 
 So PLOT measures a genuine decision attribute — the project's thesis. v1 scores one decision type
-(an open handler passing up the shot); the signed left tail is noisy at small samples, so the
-**clipped** metric is the headline. Report: [`reports/G3/`](reports/G3/README.md).
+(an open handler passing up the shot). The 208-game run is memory-bounded at any scale (peak ~5GB).
+Report: [`reports/G3/`](reports/G3/README.md).
 
 ```bash
-uv run --extra seq python scripts/build_oof_epv.py --kfold 7   # OOF EPV trace over 42 games (group k-fold)
+uv run --extra seq python scripts/build_oof_epv.py --kfold 5   # leakage-free OOF EPV trace (group k-fold)
 uv run --extra seq python scripts/build_plot_g3.py             # PLOT metric + G3 -> reports/G3/
 ```
 

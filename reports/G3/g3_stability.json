@@ -1,227 +1,227 @@
 {
-  "n_games_clean": 42,
-  "n_games_quarantined": 32,
+  "n_games_clean": 208,
+  "n_games_quarantined": 0,
   "thresholds": {
     "min_decisions": 30,
     "min_decisions_per_half": 15,
     "finishing_corr_max": 0.4
   },
   "regret_distribution": {
-    "n_decisions": 24478,
-    "n_players": 358,
-    "mean_regret_clipped": 0.0844,
-    "mean_regret_signed": -0.2413,
-    "median_regret_signed": -0.1269,
-    "frac_positive_regret": 0.3391,
-    "p90_regret_clipped": 0.1952,
-    "max_regret_clipped": 1.2881
+    "n_decisions": 124953,
+    "n_players": 424,
+    "mean_regret_clipped": 0.1431,
+    "mean_regret_signed": -0.0683,
+    "median_regret_signed": -0.066,
+    "frac_positive_regret": 0.3782,
+    "p90_regret_clipped": 0.7108,
+    "max_regret_clipped": 1.2991
   },
-  "n_players_in_metric": 249,
+  "n_players_in_metric": 380,
   "plot_leaderboard_top10": [
     {
-      "player_id": 201601,
-      "n_decisions": 35,
-      "mean_regret_signed": 0.11012552364137061,
-      "mean_regret_clipped": 0.26727904339755604,
-      "plot_per100_signed": 11.012552364137061,
-      "plot_per100_clipped": 26.727904339755604
-    },
-    {
-      "player_id": 2585,
-      "n_decisions": 33,
-      "mean_regret_signed": -0.05437944046063041,
-      "mean_regret_clipped": 0.26161529071551104,
-      "plot_per100_signed": -5.437944046063041,
-      "plot_per100_clipped": 26.161529071551104
-    },
-    {
-      "player_id": 201581,
-      "n_decisions": 61,
-      "mean_regret_signed": 0.08898487065503423,
-      "mean_regret_clipped": 0.24377124584090176,
-      "plot_per100_signed": 8.898487065503422,
-      "plot_per100_clipped": 24.377124584090176
-    },
-    {
-      "player_id": 201168,
-      "n_decisions": 43,
-      "mean_regret_signed": 0.020109514250884964,
-      "mean_regret_clipped": 0.22041114251094404,
-      "plot_per100_signed": 2.0109514250884963,
-      "plot_per100_clipped": 22.041114251094402
-    },
-    {
-      "player_id": 203457,
+      "player_id": 203101,
       "n_decisions": 59,
-      "mean_regret_signed": -0.013574985084421886,
-      "mean_regret_clipped": 0.21994771707513297,
-      "plot_per100_signed": -1.3574985084421887,
-      "plot_per100_clipped": 21.994771707513298
+      "mean_regret_signed": 0.22270206052735936,
+      "mean_regret_clipped": 0.4378832466696658,
+      "plot_per100_signed": 22.270206052735936,
+      "plot_per100_clipped": 43.78832466696658
     },
     {
-      "player_id": 203089,
-      "n_decisions": 45,
-      "mean_regret_signed": -0.0049942517238384864,
-      "mean_regret_clipped": 0.21854890569989976,
-      "plot_per100_signed": -0.49942517238384865,
-      "plot_per100_clipped": 21.854890569989976
+      "player_id": 1626149,
+      "n_decisions": 49,
+      "mean_regret_signed": 0.12668885707319574,
+      "mean_regret_clipped": 0.3867255951089197,
+      "plot_per100_signed": 12.668885707319575,
+      "plot_per100_clipped": 38.67255951089197
     },
     {
-      "player_id": 203498,
-      "n_decisions": 41,
-      "mean_regret_signed": 0.04592698839888303,
-      "mean_regret_clipped": 0.21754010903559037,
-      "plot_per100_signed": 4.592698839888303,
-      "plot_per100_clipped": 21.75401090355904
+      "player_id": 2406,
+      "n_decisions": 40,
+      "mean_regret_signed": 0.25824868656267624,
+      "mean_regret_clipped": 0.3828869832139713,
+      "plot_per100_signed": 25.824868656267626,
+      "plot_per100_clipped": 38.28869832139713
     },
     {
-      "player_id": 201973,
-      "n_decisions": 68,
-      "mean_regret_signed": -0.005377854028911301,
-      "mean_regret_clipped": 0.2113853574799712,
-      "plot_per100_signed": -0.5377854028911301,
-      "plot_per100_clipped": 21.13853574799712
+      "player_id": 201585,
+      "n_decisions": 251,
+      "mean_regret_signed": 0.2174986508134037,
+      "mean_regret_clipped": 0.3760670644468636,
+      "plot_per100_signed": 21.74986508134037,
+      "plot_per100_clipped": 37.60670644468636
     },
     {
-      "player_id": 203476,
-      "n_decisions": 78,
-      "mean_regret_signed": 0.008371209331632911,
-      "mean_regret_clipped": 0.207438289320046,
-      "plot_per100_signed": 0.8371209331632912,
-      "plot_per100_clipped": 20.7438289320046
+      "player_id": 1626161,
+      "n_decisions": 125,
+      "mean_regret_signed": 0.13845463219038873,
+      "mean_regret_clipped": 0.3591934182213212,
+      "plot_per100_signed": 13.845463219038873,
+      "plot_per100_clipped": 35.919341822132125
     },
     {
-      "player_id": 201150,
-      "n_decisions": 96,
-      "mean_regret_signed": 0.004070346194141344,
-      "mean_regret_clipped": 0.19864507660491462,
-      "plot_per100_signed": 0.40703461941413444,
-      "plot_per100_clipped": 19.864507660491462
+      "player_id": 201601,
+      "n_decisions": 100,
+      "mean_regret_signed": 0.1616414518000574,
+      "mean_regret_clipped": 0.3492595030792722,
+      "plot_per100_signed": 16.16414518000574,
+      "plot_per100_clipped": 34.92595030792722
+    },
+    {
+      "player_id": 203524,
+      "n_decisions": 43,
+      "mean_regret_signed": 0.06929338363162058,
+      "mean_regret_clipped": 0.31540237967348356,
+      "plot_per100_signed": 6.929338363162057,
+      "plot_per100_clipped": 31.540237967348357
+    },
+    {
+      "player_id": 203940,
+      "n_decisions": 91,
+      "mean_regret_signed": 0.17490786764302413,
+      "mean_regret_clipped": 0.304301386775935,
+      "plot_per100_signed": 17.490786764302413,
+      "plot_per100_clipped": 30.430138677593497
+    },
+    {
+      "player_id": 202355,
+      "n_decisions": 239,
+      "mean_regret_signed": 0.1397154135553252,
+      "mean_regret_clipped": 0.30026178958646127,
+      "plot_per100_signed": 13.971541355532521,
+      "plot_per100_clipped": 30.026178958646128
+    },
+    {
+      "player_id": 203530,
+      "n_decisions": 174,
+      "mean_regret_signed": 0.13987070309820976,
+      "mean_regret_clipped": 0.29916327618830124,
+      "plot_per100_signed": 13.987070309820975,
+      "plot_per100_clipped": 29.916327618830124
     }
   ],
   "plot_leaderboard_bottom10": [
     {
-      "player_id": 1891,
-      "n_decisions": 45,
-      "mean_regret_signed": -0.47362948432237334,
-      "mean_regret_clipped": 0.02571207025481162,
-      "plot_per100_signed": -47.36294843223733,
-      "plot_per100_clipped": 2.571207025481162
+      "player_id": 201578,
+      "n_decisions": 119,
+      "mean_regret_signed": -0.12024571821336068,
+      "mean_regret_clipped": 0.05717454470204992,
+      "plot_per100_signed": -12.024571821336068,
+      "plot_per100_clipped": 5.717454470204992
     },
     {
-      "player_id": 2757,
-      "n_decisions": 108,
-      "mean_regret_signed": -0.46109258340243736,
-      "mean_regret_clipped": 0.024953646065032645,
-      "plot_per100_signed": -46.109258340243734,
-      "plot_per100_clipped": 2.4953646065032644
+      "player_id": 203078,
+      "n_decisions": 478,
+      "mean_regret_signed": -0.12335833432004448,
+      "mean_regret_clipped": 0.055075884651872145,
+      "plot_per100_signed": -12.335833432004447,
+      "plot_per100_clipped": 5.507588465187214
     },
     {
-      "player_id": 201951,
-      "n_decisions": 38,
-      "mean_regret_signed": -1.024531454885165,
-      "mean_regret_clipped": 0.024326393183201716,
-      "plot_per100_signed": -102.4531454885165,
-      "plot_per100_clipped": 2.4326393183201716
+      "player_id": 201142,
+      "n_decisions": 355,
+      "mean_regret_signed": -0.16341081611537459,
+      "mean_regret_clipped": 0.0536332685187596,
+      "plot_per100_signed": -16.341081611537458,
+      "plot_per100_clipped": 5.363326851875961
     },
     {
-      "player_id": 201976,
-      "n_decisions": 81,
-      "mean_regret_signed": -0.5516128309887502,
-      "mean_regret_clipped": 0.02401164746947658,
-      "plot_per100_signed": -55.161283098875025,
-      "plot_per100_clipped": 2.401164746947658
-    },
-    {
-      "player_id": 201935,
-      "n_decisions": 118,
-      "mean_regret_signed": -0.5635294962732892,
-      "mean_regret_clipped": 0.022619003603064864,
-      "plot_per100_signed": -56.35294962732892,
-      "plot_per100_clipped": 2.2619003603064862
-    },
-    {
-      "player_id": 201588,
-      "n_decisions": 66,
-      "mean_regret_signed": -0.3568802794063309,
-      "mean_regret_clipped": 0.017424543428270826,
-      "plot_per100_signed": -35.68802794063309,
-      "plot_per100_clipped": 1.7424543428270827
-    },
-    {
-      "player_id": 200745,
-      "n_decisions": 43,
-      "mean_regret_signed": -0.22423899199889386,
-      "mean_regret_clipped": 0.01657137533765019,
-      "plot_per100_signed": -22.423899199889384,
-      "plot_per100_clipped": 1.657137533765019
-    },
-    {
-      "player_id": 2550,
-      "n_decisions": 38,
-      "mean_regret_signed": -0.404480533253259,
-      "mean_regret_clipped": 0.013640190526192761,
-      "plot_per100_signed": -40.4480533253259,
-      "plot_per100_clipped": 1.3640190526192761
-    },
-    {
-      "player_id": 201155,
+      "player_id": 203462,
       "n_decisions": 32,
-      "mean_regret_signed": -0.3944091773742161,
-      "mean_regret_clipped": 0.00633419608810307,
-      "plot_per100_signed": -39.44091773742161,
-      "plot_per100_clipped": 0.633419608810307
+      "mean_regret_signed": -0.3001786434816992,
+      "mean_regret_clipped": 0.05311816718714847,
+      "plot_per100_signed": -30.01786434816992,
+      "plot_per100_clipped": 5.311816718714847
     },
     {
-      "player_id": 202708,
-      "n_decisions": 66,
-      "mean_regret_signed": -0.43425067370294296,
-      "mean_regret_clipped": 0.002987178030556979,
-      "plot_per100_signed": -43.42506737029429,
-      "plot_per100_clipped": 0.2987178030556979
+      "player_id": 201571,
+      "n_decisions": 274,
+      "mean_regret_signed": -0.10804724568953149,
+      "mean_regret_clipped": 0.05308514315660336,
+      "plot_per100_signed": -10.804724568953148,
+      "plot_per100_clipped": 5.308514315660336
+    },
+    {
+      "player_id": 203148,
+      "n_decisions": 117,
+      "mean_regret_signed": -0.11592113602152328,
+      "mean_regret_clipped": 0.04846101989104787,
+      "plot_per100_signed": -11.592113602152327,
+      "plot_per100_clipped": 4.8461019891047865
+    },
+    {
+      "player_id": 201566,
+      "n_decisions": 718,
+      "mean_regret_signed": -0.1577270084696146,
+      "mean_regret_clipped": 0.047163377857833026,
+      "plot_per100_signed": -15.77270084696146,
+      "plot_per100_clipped": 4.716337785783303
+    },
+    {
+      "player_id": 2403,
+      "n_decisions": 43,
+      "mean_regret_signed": -0.1753123832453136,
+      "mean_regret_clipped": 0.03764415483114428,
+      "plot_per100_signed": -17.53123832453136,
+      "plot_per100_clipped": 3.7644154831144276
+    },
+    {
+      "player_id": 202322,
+      "n_decisions": 811,
+      "mean_regret_signed": -0.1784495867100699,
+      "mean_regret_clipped": 0.03611672172444385,
+      "plot_per100_signed": -17.844958671006992,
+      "plot_per100_clipped": 3.611672172444385
+    },
+    {
+      "player_id": 101126,
+      "n_decisions": 52,
+      "mean_regret_signed": -0.135830573448659,
+      "mean_regret_clipped": 0.026275080658904555,
+      "plot_per100_signed": -13.583057344865901,
+      "plot_per100_clipped": 2.6275080658904555
     }
   ],
   "G3a_split_half_clipped": {
-    "n_players": 143,
+    "n_players": 347,
     "value_col": "regret_clipped",
     "min_decisions_per_half": 15,
-    "pearson_r": 0.3841,
-    "pearson_p": 2e-06,
-    "spearman_r": 0.3208,
-    "spearman_p": 9.4e-05,
-    "spearman_brown_full": 0.555
+    "pearson_r": 0.5142,
+    "pearson_p": 0.0,
+    "spearman_r": 0.5498,
+    "spearman_p": 0.0,
+    "spearman_brown_full": 0.6792
   },
   "G3a_split_half_signed": {
-    "n_players": 143,
+    "n_players": 347,
     "value_col": "regret_signed",
     "min_decisions_per_half": 15,
-    "pearson_r": 0.334,
-    "pearson_p": 4.6e-05,
-    "spearman_r": 0.3293,
-    "spearman_p": 5.9e-05,
-    "spearman_brown_full": 0.5008
+    "pearson_r": 0.4501,
+    "pearson_p": 0.0,
+    "spearman_r": 0.4621,
+    "spearman_p": 0.0,
+    "spearman_brown_full": 0.6208
   },
   "G3b_player_fixed_effects": {
     "value_col": "regret_signed",
-    "n_decisions": 24478,
-    "n_players_with_fe": 249,
-    "r2_location_only": 0.2593,
-    "r2_location_plus_player": 0.2839,
-    "incremental_r2_player": 0.0246,
-    "f_stat": 3.3488,
+    "n_decisions": 124953,
+    "n_players_with_fe": 380,
+    "r2_location_only": 0.084,
+    "r2_location_plus_player": 0.0976,
+    "incremental_r2_player": 0.0136,
+    "f_stat": 4.9576,
     "f_df": [
-      249,
-      24224
+      380,
+      124568
     ],
     "p_value": 0.0
   },
   "G3b_finishing_independence": {
-    "n_players": 184,
+    "n_players": 351,
     "regret_col": "mean_regret_signed",
-    "pearson_r": -0.0372,
-    "pearson_p": 0.616173,
-    "spearman_r": -0.0145,
-    "spearman_p": 0.844627
+    "pearson_r": -0.1734,
+    "pearson_p": 0.001111,
+    "spearman_r": -0.1888,
+    "spearman_p": 0.000375
   },
   "G3_gate": {
     "stable_split_half": true,
