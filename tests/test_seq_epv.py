@@ -158,6 +158,28 @@ def test_max_frames_cap_keeps_most_recent():
     assert np.array_equal(item["wall_ms"].numpy(), np.arange(12, 20))
 
 
+def test_epv_frame_table_caps_pathological_possession():
+    # Regression: a boundary-merge artifact (thousands of frames) must NOT pad a whole batch and
+    # OOM — epv_frame_table caps each possession to its last max_frames. Short possessions untouched.
+    pytest.importorskip("torch")
+    import polars as pl
+
+    from plot.models.eval_bar.seq_model import SeqEPV, epv_frame_table
+
+    short = _toy_seq(50, 1, seed=1)
+    short.possession_id = 1
+    monster = _toy_seq(5000, 2, seed=2)   # artifact spanning thousands of frames
+    monster.possession_id = 2
+    out = epv_frame_table(SeqEPV().eval(), [short, monster], device="cpu",
+                          batch_possessions=8, max_frames=640)
+    n_short = out.filter(pl.col("possession_id") == 1).height
+    n_monster = out.filter(pl.col("possession_id") == 2).height
+    assert n_short == 50          # real possession fully scored
+    assert n_monster == 640       # artifact truncated to the cap, not 5000 -> bounded memory
+    wm = out.filter(pl.col("possession_id") == 2)["wall_clock_ms"].to_list()
+    assert wm[0] == 5000 - 640 and wm[-1] == 4999   # kept frames are the most recent
+
+
 def test_tiny_training_runs_and_improves():
     pytest.importorskip("torch")
     from plot.eval.calibration import multiclass_logloss

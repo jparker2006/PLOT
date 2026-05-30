@@ -70,6 +70,7 @@ def run_logo_epv_traces(
     """
     games = game_ids or sorted(corpus.keys())
     batch = int((cfg or {}).get("batch_possessions", 64))
+    trace_cap = int((cfg or {}).get("trace_max_frames", 640))
     parts = []
     for held in games:
         train_ids = [g for g in games if g != held]
@@ -79,7 +80,8 @@ def run_logo_epv_traces(
         if verbose:
             print(f"  trace fold held={held} val={val_id} fit_poss={len(fit_seqs)}")
         model, _ = train_seq(fit_seqs, val_seqs, cfg=cfg, device=device, seed=seed, verbose=verbose)
-        parts.append(epv_frame_table(model, corpus[held], device=device, batch_possessions=batch))
+        parts.append(epv_frame_table(model, corpus[held], device=device,
+                                     batch_possessions=batch, max_frames=trace_cap))
     return pl.concat(parts) if parts else pl.DataFrame()
 
 
@@ -116,6 +118,7 @@ def run_kfold_epv_traces(
     """
     games = game_ids or sorted(corpus.keys())
     batch = int((cfg or {}).get("batch_possessions", 64))
+    trace_cap = int((cfg or {}).get("trace_max_frames", 640))
     groups = kfold_groups(games, n_folds)
     parts = []
     for fi, held_group in enumerate(groups):
@@ -128,5 +131,6 @@ def run_kfold_epv_traces(
             print(f"  kfold {fi + 1}/{len(groups)} held={held_group} val={val_id} fit_poss={len(fit_seqs)}")
         model, _ = train_seq(fit_seqs, val_seqs, cfg=cfg, device=device, seed=seed, verbose=verbose)
         for g in held_group:
-            parts.append(epv_frame_table(model, corpus[g], device=device, batch_possessions=batch))
+            parts.append(epv_frame_table(model, corpus[g], device=device,
+                                         batch_possessions=batch, max_frames=trace_cap))
     return pl.concat(parts) if parts else pl.DataFrame()

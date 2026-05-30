@@ -317,11 +317,18 @@ def predict_seq(model: nn.Module, seqs: list[PossessionSeq], *, device: str | No
 
 @torch.no_grad()
 def epv_frame_table(model: nn.Module, seqs: list[PossessionSeq], *, device: str | None = None,
-                    batch_possessions: int = 64, max_frames: int = 100_000) -> pl.DataFrame:
+                    batch_possessions: int = 64, max_frames: int = 640) -> pl.DataFrame:
     """Per-frame EPV trace keyed for the action-value layer: game_id, possession_id, wall_clock_ms, frame_idx, epv.
 
-    Defaults to NO frame cap (``max_frames`` huge) so every action boundary has an EPV — unlike the
-    G1 ``predict_seq``, which caps to mirror training. Used by Stage 3 (``plot.models.action_value``).
+    Caps each possession to its most-recent ``max_frames`` frames (default 640 = 64s, ~2x the 320
+    training cap) so every action boundary in a *real* possession (≤ ~40s) still gets an EPV, while
+    bounding memory. This matters at scale: boundary-merge segmentation artifacts can span many
+    thousands of frames, and uncapped those padded a whole batch to that length and OOM'd the box
+    (a single monster possession × batch 64 → tens of GB). The model was itself trained on ≤320-frame
+    contexts, so scoring far beyond that is extrapolation regardless. Possessions shorter than the cap
+    are unaffected; only artifact mega-possessions are truncated to their last ``max_frames`` (their
+    earliest action boundaries then lack an EPV and are simply skipped downstream — they are joined on
+    wall_clock_ms, not frame_idx). Used by Stage 3 (``plot.models.action_value``) and the OOF trace.
     """
     device = device or default_device()
     model.eval()
