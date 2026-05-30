@@ -1,0 +1,206 @@
+{
+  "corpus": {
+    "clean_games": 42,
+    "open_look_decisions": 15287,
+    "n_took": 1200,
+    "n_declined": 14087
+  },
+  "design": {
+    "universe": "open ball-handler (nearest def >= 4ft, <=30ft from rim) who took (terminal shot) or declined (pass) the look",
+    "outcome": "realized possession points R",
+    "benchmark": "S = own open-shot xPoints at actual contest",
+    "controls": [
+      "epv_at_decision",
+      "dist_to_rim",
+      "three_pt",
+      "nearest_def_dist"
+    ],
+    "team_fe": true,
+    "inference": "game-cluster bootstrap"
+  },
+  "taker_calibration": [
+    {
+      "s_bin": 0,
+      "n": 150,
+      "mean_value": 0.8413,
+      "mean_realized": 1.14
+    },
+    {
+      "s_bin": 1,
+      "n": 150,
+      "mean_value": 0.9602,
+      "mean_realized": 1.2333
+    },
+    {
+      "s_bin": 2,
+      "n": 150,
+      "mean_value": 1.0493,
+      "mean_realized": 1.2
+    },
+    {
+      "s_bin": 3,
+      "n": 150,
+      "mean_value": 1.1083,
+      "mean_realized": 1.5667
+    },
+    {
+      "s_bin": 4,
+      "n": 150,
+      "mean_value": 1.1591,
+      "mean_realized": 1.4733
+    },
+    {
+      "s_bin": 5,
+      "n": 150,
+      "mean_value": 1.2233,
+      "mean_realized": 1.48
+    },
+    {
+      "s_bin": 6,
+      "n": 150,
+      "mean_value": 1.3319,
+      "mean_realized": 1.5467
+    },
+    {
+      "s_bin": 7,
+      "n": 150,
+      "mean_value": 1.6962,
+      "mean_realized": 1.7133
+    }
+  ],
+  "cost_of_declining_by_value": [
+    {
+      "s_bin": 0,
+      "mean_value": 0.8221,
+      "n_took": 143,
+      "n_declined": 2405,
+      "mean_realized_took": 1.1538,
+      "mean_realized_declined": 0.9676,
+      "raw_cost_of_declining": 0.1863
+    },
+    {
+      "s_bin": 1,
+      "mean_value": 0.9718,
+      "n_took": 189,
+      "n_declined": 2359,
+      "mean_realized_took": 1.1429,
+      "mean_realized_declined": 0.9631,
+      "raw_cost_of_declining": 0.1797
+    },
+    {
+      "s_bin": 2,
+      "mean_value": 1.0786,
+      "n_took": 254,
+      "n_declined": 2293,
+      "mean_realized_took": 1.4528,
+      "mean_realized_declined": 1.0222,
+      "raw_cost_of_declining": 0.4305
+    },
+    {
+      "s_bin": 3,
+      "mean_value": 1.1834,
+      "n_took": 272,
+      "n_declined": 2276,
+      "mean_realized_took": 1.4118,
+      "mean_realized_declined": 1.0927,
+      "raw_cost_of_declining": 0.3191
+    },
+    {
+      "s_bin": 4,
+      "mean_value": 1.3056,
+      "n_took": 170,
+      "n_declined": 2378,
+      "mean_realized_took": 1.6824,
+      "mean_realized_declined": 1.1749,
+      "raw_cost_of_declining": 0.5074
+    },
+    {
+      "s_bin": 5,
+      "mean_value": 1.6396,
+      "n_took": 172,
+      "n_declined": 2376,
+      "mean_realized_took": 1.6453,
+      "mean_realized_declined": 1.08,
+      "raw_cost_of_declining": 0.5654
+    }
+  ],
+  "adjusted_decline_cost": {
+    "n_decisions": 15287,
+    "n_games": 42,
+    "n_took": 1200,
+    "n_declined": 14087,
+    "s_mean": 1.1669,
+    "s_high_quantile": 0.9,
+    "s_high": 1.5771,
+    "points_lost_by_declining_at_meanS": 0.3593,
+    "ci_meanS": [
+      0.2788,
+      0.451
+    ],
+    "p_meanS": 0.0,
+    "points_lost_by_declining_at_highS": 0.5032,
+    "ci_highS": [
+      0.3478,
+      0.669
+    ],
+    "p_highS": 0.0,
+    "interaction_declinedxS": -0.3507,
+    "ci_interaction": [
+      -0.6677,
+      -0.0655
+    ],
+    "p_interaction": 0.024,
+    "controls": [
+      "epv_at_decision",
+      "dist_to_rim",
+      "three_pt",
+      "nearest_def_dist"
+    ],
+    "team_fe": true,
+    "n_boot": 500
+  },
+  "robustness_shot_ending_possessions": {
+    "note": "possessions that ended in a FGA (no turnovers); same structural position for both groups",
+    "n_decisions": 11804,
+    "n_took": 1200,
+    "n_declined": 10604,
+    "points_lost_at_highS": 0.4914,
+    "ci_highS": [
+      0.3043,
+      0.6922
+    ],
+    "p_highS": 0.0,
+    "interaction": -0.4116,
+    "survives": true
+  },
+  "gate": {
+    "gate": {
+      "high_value_decline_costs_points": true,
+      "cost_grows_with_value": true
+    },
+    "pass": true,
+    "headline_points_lost_high_value": 0.5032,
+    "headline_ci": [
+      0.3478,
+      0.669
+    ],
+    "verdict": "declining valuable open looks costs real points \u2014 the regret signal is outcome-valid at the decision level"
+  },
+  "player_level_exploratory": {
+    "n_players": 239,
+    "plot_per100": {
+      "pearson_r": 0.2164,
+      "pearson_p": 0.000759
+    },
+    "within_role_per100": {
+      "pearson_r": 0.2669,
+      "pearson_p": 2.9e-05
+    },
+    "caveat": "S-R shares S with model regret (partly mechanical); exploratory + underpowered at 42 games"
+  },
+  "caveats": [
+    "taker calibration shows realized > model value S (offensive-rebound putbacks counted in possession R + coarse terminal-attribution) \u21d2 the ABSOLUTE points-lost is an upper bound; the SIGN and the dose-response (cost grows with look value) are the robust claims",
+    "92% of open-handler decisions are declines; the taker pool (1.2k) is structurally drawn from shot-ending possessions \u2014 the shot-ending robustness cut addresses this",
+    "selection on UNOBSERVABLES (a developing better play the tracking can't see) is bounded by conditioning on observables incl. model EPV at the decision, not eliminated (G5b caveat)"
+  ]
+}

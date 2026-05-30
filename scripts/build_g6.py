@@ -38,8 +38,20 @@ from plot.eval.decomposition import (  # noqa: E402
     residualize_on_context,
     variance_decomposition,
 )
-from plot.models.regret.pipeline import build_v15_regret  # noqa: E402
+from plot.eval.outcome_validity import (  # noqa: E402
+    adjusted_decline_cost,
+    cost_of_declining_by_value,
+    outcome_validity_gate,
+    taker_calibration,
+)
+from plot.models.regret.pipeline import (  # noqa: E402
+    load_game_intermediates,
+    open_looks_from_intermediates,
+    regret_from_intermediates,
+)
 from plot.models.regret.plot_metric import split_half_stability  # noqa: E402
+
+OPEN_LOOK_CONTROLS = ["epv_at_decision", "dist_to_rim", "three_pt", "nearest_def_dist"]
 
 MIN_DECISIONS = 30
 MIN_PER_HALF = 15
@@ -61,8 +73,9 @@ def main() -> None:
     trace_games = set(trace["game_id"].unique().to_list())
     games = sorted(p.stem for p in Path(args.raw_dir, "json").glob("*.json") if p.stem in trace_games)
 
-    regret, _shots, _xmodel, clean = build_v15_regret(games, raw_dir=args.raw_dir, trace=trace,
-                                                       completion=args.completion)
+    inter = load_game_intermediates(games, raw_dir=args.raw_dir)
+    clean = inter["clean"]
+    regret = regret_from_intermediates(inter, trace=trace, completion=args.completion)
     print(f"clean games: {len(clean)} | decisions: {regret.height} "
           f"({regret['player_id'].n_unique()} players)")
 
@@ -134,6 +147,100 @@ def main() -> None:
     print(f"  VERDICT: {gate['verdict']}")
     print(f"  wrote {out}/g6_step1.json + {args.per_player_out}")
 
+    # ===================== STEP 2 — outcome validity (the keystone) =====================
+    looks = open_looks_from_intermediates(inter, trace=trace).drop_nulls(["R", "epv_at_decision", "S"])
+    n_took = int((looks["declined"] == 0).sum())
+    n_dec = int((looks["declined"] == 1).sum())
+    print(f"\nopen-look decisions: {looks.height} (took {n_took}, declined {n_dec})")
+
+    calib = taker_calibration(looks, n_bins=8)
+    cbv = cost_of_declining_by_value(looks, n_bins=6)
+    adj = adjusted_decline_cost(looks, controls=OPEN_LOOK_CONTROLS, n_boot=500, seed=0)
+    ov_gate = outcome_validity_gate(adj, cbv)
+    player_lv = _player_level(looks, named)
+
+    # robustness: restrict to possessions that ended in a FIELD-GOAL ATTEMPT (no turnovers) so both
+    # groups sit in the same structural position — isolates "declining ⇒ worse downstream shot" from
+    # "declining ⇒ turnover exposure". If the cost survives here it is not just turnover-risk.
+    shotend = looks.filter(pl.col("end_reason").is_in(["made_fg", "defensive_rebound"]))
+    adj_shotend = adjusted_decline_cost(shotend, controls=OPEN_LOOK_CONTROLS, n_boot=500, seed=0)
+    survives_shotend = bool(adj_shotend["points_lost_by_declining_at_highS"] > 0
+                            and adj_shotend["ci_highS"][0] > 0)
+
+    report2 = {
+        "corpus": {"clean_games": len(clean), "open_look_decisions": looks.height,
+                   "n_took": n_took, "n_declined": n_dec},
+        "design": {"universe": "open ball-handler (nearest def >= 4ft, <=30ft from rim) who took (terminal shot) "
+                               "or declined (pass) the look", "outcome": "realized possession points R",
+                   "benchmark": "S = own open-shot xPoints at actual contest", "controls": OPEN_LOOK_CONTROLS,
+                   "team_fe": True, "inference": "game-cluster bootstrap"},
+        "taker_calibration": calib,
+        "cost_of_declining_by_value": cbv,
+        "adjusted_decline_cost": adj,
+        "robustness_shot_ending_possessions": {
+            "note": "possessions that ended in a FGA (no turnovers); same structural position for both groups",
+            "n_decisions": adj_shotend["n_decisions"], "n_took": adj_shotend["n_took"],
+            "n_declined": adj_shotend["n_declined"],
+            "points_lost_at_highS": adj_shotend["points_lost_by_declining_at_highS"],
+            "ci_highS": adj_shotend["ci_highS"], "p_highS": adj_shotend["p_highS"],
+            "interaction": adj_shotend["interaction_declinedxS"], "survives": survives_shotend,
+        },
+        "gate": ov_gate,
+        "player_level_exploratory": player_lv,
+        "caveats": [
+            "taker calibration shows realized > model value S (offensive-rebound putbacks counted in "
+            "possession R + coarse terminal-attribution) ⇒ the ABSOLUTE points-lost is an upper bound; "
+            "the SIGN and the dose-response (cost grows with look value) are the robust claims",
+            "92% of open-handler decisions are declines; the taker pool (1.2k) is structurally drawn "
+            "from shot-ending possessions — the shot-ending robustness cut addresses this",
+            "selection on UNOBSERVABLES (a developing better play the tracking can't see) is bounded by "
+            "conditioning on observables incl. model EPV at the decision, not eliminated (G5b caveat)",
+        ],
+    }
+    (out / "g6_step2.json").write_text(json.dumps(report2, indent=2))
+    _plot_step2(calib, cbv, adj, out)
+
+    print("=== G6 step 2 — outcome validity (decision-level keystone) ===")
+    print("  taker calibration value→realized: "
+          + ", ".join(f"{c['mean_value']:.2f}->{c['mean_realized']:.2f}" for c in calib))
+    print("  raw cost of declining by S-bin: "
+          + ", ".join(f"{r['mean_value']:.2f}:{r['raw_cost_of_declining']:+.3f}" for r in cbv))
+    print(f"  ADJUSTED points lost by declining — meanS {adj['points_lost_by_declining_at_meanS']} "
+          f"CI{adj['ci_meanS']} p={adj['p_meanS']} | highS({adj['s_high']}) "
+          f"{adj['points_lost_by_declining_at_highS']} CI{adj['ci_highS']} p={adj['p_highS']}")
+    print(f"  interaction declined×S {adj['interaction_declinedxS']} CI{adj['ci_interaction']} "
+          f"(negative ⇒ cost grows with look value)")
+    print(f"  ROBUSTNESS (shot-ending possessions only, no TOs): highS lost "
+          f"{adj_shotend['points_lost_by_declining_at_highS']} CI{adj_shotend['ci_highS']} "
+          f"survives={survives_shotend} (n_took={adj_shotend['n_took']}, n_dec={adj_shotend['n_declined']})")
+    print(f"  player-level (exploratory): {player_lv}")
+    print(f"  GATE: {ov_gate['gate']} PASS={ov_gate['pass']}")
+    print(f"  VERDICT: {ov_gate['verdict']}")
+    print(f"  wrote {out}/g6_step2.json")
+
+
+def _player_level(looks: pl.DataFrame, named: pl.DataFrame) -> dict:
+    """Exploratory player-level: does model PLOT / within-role residual track the realized shortfall
+    (S−R) on a player's DECLINED open looks? Shares S with regret (partly mechanical) and is thin at
+    42 games — reported with that caveat, not as a gate."""
+    from scipy import stats  # noqa: PLC0415
+    dec = looks.filter(pl.col("declined") == 1)
+    per = (
+        dec.group_by("player_id")
+        .agg(pl.len().alias("n_declined"), (pl.col("S") - pl.col("R")).mean().alias("realized_decline_shortfall"))
+        .filter(pl.col("n_declined") >= 20)
+    )
+    j = per.join(named.select("player_id", "plot_per100", "within_role_per100"), on="player_id", how="inner")
+    if j.height < 5:
+        return {"n_players": int(j.height), "note": "too few players"}
+    out = {"n_players": int(j.height)}
+    y = j["realized_decline_shortfall"].to_numpy()
+    for col in ("plot_per100", "within_role_per100"):
+        r, p = stats.pearsonr(j[col].to_numpy(), y)
+        out[col] = {"pearson_r": round(float(r), 4), "pearson_p": round(float(p), 6)}
+    out["caveat"] = "S-R shares S with model regret (partly mechanical); exploratory + underpowered at 42 games"
+    return out
+
 
 def _plot(named: pl.DataFrame, decomp: dict, rel_raw: dict, rel_resid: dict, out: Path) -> None:
     fig, ax = plt.subplots(1, 2, figsize=(11, 4.6))
@@ -155,6 +262,30 @@ def _plot(named: pl.DataFrame, decomp: dict, rel_raw: dict, rel_resid: dict, out
         ax[1].text(i, v, f"{v:.2f}", ha="center", va="bottom" if v >= 0 else "top")
     fig.tight_layout()
     fig.savefig(out / "g6_step1_decomposition.png", dpi=120)
+    plt.close(fig)
+
+
+def _plot_step2(calib: list[dict], cbv: list[dict], adj: dict, out: Path) -> None:
+    fig, ax = plt.subplots(1, 2, figsize=(11, 4.6))
+    if calib:
+        mv = [c["mean_value"] for c in calib]
+        mr = [c["mean_realized"] for c in calib]
+        ax[0].scatter(mv, mr, s=28, color="#2c3e50", zorder=3)
+        lo, hi = min(mv + mr), max(mv + mr)
+        ax[0].plot([lo, hi], [lo, hi], "--", color="#aaaaaa", lw=1)
+        ax[0].set(xlabel="model open-shot value S (xPoints)", ylabel="realized points when TAKEN",
+                  title="taker calibration: is S a fair benchmark?")
+    if cbv:
+        mv = [r["mean_value"] for r in cbv]
+        cost = [r["raw_cost_of_declining"] for r in cbv]
+        ax[1].plot(mv, cost, "-o", color="#c0392b")
+        ax[1].axhline(0.0, color="#333", lw=0.8)
+        ax[1].set(xlabel="model open-shot value S (xPoints)",
+                  ylabel="realized points lost by declining",
+                  title=f"cost of declining vs look value\nadj high-S: "
+                        f"{adj.get('points_lost_by_declining_at_highS')} CI{adj.get('ci_highS')}")
+    fig.tight_layout()
+    fig.savefig(out / "g6_step2_outcome_validity.png", dpi=120)
     plt.close(fig)
 
 

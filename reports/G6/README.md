@@ -57,3 +57,58 @@ isolated."*
 
 **Caveat.** 42-game corpus; the residual reliability (0.44) is solid but lower than raw (0.79), so the
 within-role number is the less-powered one — a reason step 3 (scale to 208) exists if step 2 needs it.
+
+---
+
+## Step 2 — outcome validity: does "points left" cost REAL points? (`g6_step2.json`)
+
+**The keystone.** Everything through step 1 is internal (model-vs-model). This is the one test that
+touches reality. The cleanest decision the metric makes is the **open look**: a ball-handler with
+nobody within 4 ft either takes the shot or declines it (passes). We observe REALIZED possession
+points for *both* choices, so the counterfactual "what taking would have yielded" comes from real
+shooters at matched situations, not the model.
+
+**Method.** 15,287 open-handler decisions (42 games), each labelled `declined` (passed, 14,087) vs
+`took` (terminal shot, 1,200), with the own open-shot model value `S` (xPoints at actual contest),
+the REALIZED possession points `R`, and observable controls (model EPV at the decision, location,
+openness) + team fixed effects. Inference by **game-cluster bootstrap**.
+`src/plot/eval/outcome_validity.py` + `scripts/build_g6.py`; unit-tested in `tests/test_outcome_validity.py`.
+
+**Result — the regret signal is outcome-valid at the decision level.**
+
+| readout | value | reading |
+|---|---|---|
+| raw cost of declining, by look value `S` | +0.19 → **+0.57** as S: 0.82→1.64 | declining a *better* look costs *more* — the dose-response regret predicts |
+| adjusted points lost by declining, mean S | **0.36** [0.28, 0.45], p≈0 | net of observables + team |
+| adjusted points lost, high-value look (S≈1.58) | **0.50** [0.35, 0.67], p≈0 | passing up a great open look costs ~½ pt |
+| `declined × S` interaction | **−0.35** [−0.67, −0.07] | cost grows with look value (CI excludes 0) |
+| **robustness: shot-ending possessions only** (no TOs) | **0.49** [0.30, 0.69], survives ✓ | not turnover-exposure — a *worse downstream shot* |
+
+**Why it's not an artifact.**
+* **Dose-response.** The cost scales with the model's shot value `S` — exactly what regret predicts,
+  and hard to produce with simple selection (a pure pool-composition confound would be ~flat in `S`).
+* **Turnover-exposure ruled out.** Restricting to possessions that ended in a field-goal attempt
+  (both groups same structural position) the cost barely moves (0.50→0.49, CI still excludes 0). So
+  it isn't "passing risks turnovers" — declining a good look yields a genuinely *worse* shot later.
+* **Against selection-on-unobservables.** If decliners passed because they saw a better play
+  developing, their realized outcome should be *better*; it's *worse*. So on average these declines
+  weren't justified by unobserved options (individual ones may be).
+
+**Honest caveats (in the report).**
+* **Magnitude is an upper bound.** Taker calibration shows realized > model value `S` (0.84→1.14, …)
+  because possession-level `R` counts offensive-rebound putbacks and the terminal action is
+  attributed coarsely to the tracking handler. The robust claims are the **sign** and the
+  **dose-response**, not the exact 0.5-point figure.
+* **Selection on unobservables** is *bounded* (we condition on the model's EPV at the decision +
+  openness/location) but never fully eliminated — the standing G5b limitation.
+* **Player-level (exploratory, stretch).** Per-player model PLOT and the within-role residual
+  correlate with a player's realized decline-shortfall (r≈0.22 / **0.27**, p<0.001, n=239) — but
+  `S−R` shares `S` with regret (partly mechanical) and 42 games is thin. Suggestive, not a gate. The
+  cleaner player-level test (PLOT → team offense beyond box) is what step 3's scale-up would power.
+
+**Verdict.** **G6 PASSES at the decision level** — the minimum bar for the paper's central claim.
+*Players systematically leave points by declining open looks; the cost is measurable, scales with how
+good the look was, survives removing turnover-risk, and is invisible to the box score.* The
+player-level attribution and the exact magnitude are where more data (step 3) would help; the
+decision-level finding is real and defensible now.
+
