@@ -81,3 +81,52 @@ def run_logo_epv_traces(
         model, _ = train_seq(fit_seqs, val_seqs, cfg=cfg, device=device, seed=seed, verbose=verbose)
         parts.append(epv_frame_table(model, corpus[held], device=device, batch_possessions=batch))
     return pl.concat(parts) if parts else pl.DataFrame()
+
+
+def kfold_groups(games: list[str], n_folds: int) -> list[list[str]]:
+    """Deterministic round-robin partition of sorted games into ``n_folds`` balanced groups.
+
+    Round-robin (game i -> fold i % n_folds over sorted games) keeps fold sizes within one of each
+    other and avoids any temporal block bias from contiguous-date chunks.
+    """
+    ordered = sorted(games)
+    folds: list[list[str]] = [[] for _ in range(max(1, n_folds))]
+    for i, g in enumerate(ordered):
+        folds[i % len(folds)].append(g)
+    return [f for f in folds if f]
+
+
+def run_kfold_epv_traces(
+    corpus: dict[str, list[PossessionSeq]],
+    game_ids: list[str] | None = None,
+    *,
+    n_folds: int = 7,
+    cfg: dict | None = None,
+    device: str | None = None,
+    seed: int = 1729,
+    verbose: bool = False,
+) -> pl.DataFrame:
+    """Leakage-free per-frame OOF EPV trace via GROUP k-fold — the scalable LOGO substitute.
+
+    Identical contract to :func:`run_logo_epv_traces` (every frame of every game gets an EPV from a
+    model that never trained on that game), but holds out a *group* of games per fold so the corpus
+    is covered in ``n_folds`` trainings rather than one-per-game. At 42 games LOGO is 42 trainings;
+    7 folds of ~6 games is 7. Still strictly leakage-free: a held game is never in its scorer's
+    training set. One further game (outside the held group) is carved as the early-stop watch set.
+    """
+    games = game_ids or sorted(corpus.keys())
+    batch = int((cfg or {}).get("batch_possessions", 64))
+    groups = kfold_groups(games, n_folds)
+    parts = []
+    for fi, held_group in enumerate(groups):
+        held_set = set(held_group)
+        train_ids = [g for g in games if g not in held_set]
+        val_id = inner_val_game(train_ids, held_group[0]) if len(train_ids) > 1 else None
+        fit_seqs = [s for g in train_ids if g != val_id for s in corpus[g]]
+        val_seqs = corpus[val_id] if val_id else None
+        if verbose:
+            print(f"  kfold {fi + 1}/{len(groups)} held={held_group} val={val_id} fit_poss={len(fit_seqs)}")
+        model, _ = train_seq(fit_seqs, val_seqs, cfg=cfg, device=device, seed=seed, verbose=verbose)
+        for g in held_group:
+            parts.append(epv_frame_table(model, corpus[g], device=device, batch_possessions=batch))
+    return pl.concat(parts) if parts else pl.DataFrame()

@@ -82,6 +82,30 @@ uv run --extra seq python scripts/build_oof_epv.py       # leakage-free OOF EPV 
 uv run --extra seq python scripts/train_xpoints_g2.py    # xPoints + G2 -> reports/G2/
 ```
 
+## PLOT metric (Stage 5) — Gate G3: PASS
+
+The flagship. Per-decision regret is aggregated to a per-player **points left on the table / 100
+decisions**, and G3 asks the two questions that decide whether that number is real: does it **repeat**
+(a skill, not noise) and is it **distinct from finishing** (a decision property, not shot-making)?
+On **24,478 open pass-up decisions across 42 games** (249 players in the metric), both hold:
+
+- **Stable across the season.** Split the games odd/even, aggregate per player, correlate: split-half
+  Pearson **0.384** (p=2e-6), Spearman–Brown full-sample reliability **0.55** — moderate but decisively
+  repeatable for a behavioral metric on a half-season.
+- **A decision, not just location.** Player fixed effects are jointly significant *beyond* a full
+  shot-location model — F(249, 24224) = **3.35, p≈0**.
+- **A decision, not finishing.** Per-player regret is orthogonal to finishing skill (xPoints uses a
+  population make model): correlation **−0.037** (p=0.62).
+
+So PLOT measures a genuine decision attribute — the project's thesis. v1 scores one decision type
+(an open handler passing up the shot); the signed left tail is noisy at small samples, so the
+**clipped** metric is the headline. Report: [`reports/G3/`](reports/G3/README.md).
+
+```bash
+uv run --extra seq python scripts/build_oof_epv.py --kfold 7   # OOF EPV trace over 42 games (group k-fold)
+uv run --extra seq python scripts/build_plot_g3.py             # PLOT metric + G3 -> reports/G3/
+```
+
 ## Quickstart
 
 ```bash

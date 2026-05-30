@@ -19,7 +19,7 @@ import polars as pl
 
 from plot.config import load_config, seq_epv_config
 from plot.models.counterfactual.calibrate import recalibrate_epv_oof
-from plot.models.eval_bar.seq_crossval import run_logo_epv_traces
+from plot.models.eval_bar.seq_crossval import run_kfold_epv_traces, run_logo_epv_traces
 from plot.models.eval_bar.seq_dataset import build_sequence_corpus
 
 
@@ -35,6 +35,9 @@ def main() -> None:
     ap.add_argument("--raw-dir", default="data/raw")
     ap.add_argument("--out", default="data/processed/oof_epv_trace.parquet")
     ap.add_argument("--device", default=None)
+    ap.add_argument("--kfold", type=int, default=None,
+                    help="use group k-fold with this many folds (leakage-free, scalable) instead of LOGO; "
+                         "recommended once the corpus exceeds ~15 games (LOGO becomes one training per game)")
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args()
 
@@ -42,8 +45,13 @@ def main() -> None:
     games = args.games or sorted(p.stem for p in Path(args.raw_dir, "json").glob("*.json"))
     corpus, reports = build_sequence_corpus(games, raw_dir=args.raw_dir)
     clean = sorted(corpus)
-    print(f"clean games: {len(clean)} | building OOF EPV traces (LOGO)...")
-    trace = run_logo_epv_traces(corpus, clean, cfg=seq_cfg, device=args.device, verbose=args.verbose)
+    if args.kfold:
+        print(f"clean games: {len(clean)} | building OOF EPV traces (group {args.kfold}-fold)...")
+        trace = run_kfold_epv_traces(corpus, clean, n_folds=args.kfold, cfg=seq_cfg,
+                                     device=args.device, verbose=args.verbose)
+    else:
+        print(f"clean games: {len(clean)} | building OOF EPV traces (LOGO)...")
+        trace = run_logo_epv_traces(corpus, clean, cfg=seq_cfg, device=args.device, verbose=args.verbose)
     # fold-safe isotonic recalibration -> epv_cal (the calibrated EPV the counterfactual consumes)
     trace = recalibrate_epv_oof(trace, _realized_from_corpus(corpus))
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)

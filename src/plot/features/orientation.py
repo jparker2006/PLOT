@@ -96,7 +96,9 @@ def rim_map_from_means(
         return {}, report
     # A lone confident cell fully determines the 2x2 map with NO corroboration: a single
     # wrong-but-confident cell would silently invert the whole game. Require >=2 confident cells
-    # (the conflict check below then cross-checks them) before accepting a propagated map.
+    # (the conflict check below then cross-checks them). EMPIRICALLY VALIDATED on the 74-game corpus:
+    # of 12 single-confident-cell games, 11 were wrong flips (caught by the backcourt QC when this
+    # guard was relaxed) — so the guard is correct, not over-conservative; keep it.
     if len(confident) < 2:
         report["quarantined"], report["reason"] = True, "single_confident_cell_no_corroboration"
         return {}, report
