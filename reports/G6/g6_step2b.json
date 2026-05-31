@@ -1,9 +1,9 @@
 {
   "corpus": {
-    "clean_games": 42,
-    "decisions": 11572,
-    "n_shot_over": 2982,
-    "n_kicked": 8590
+    "clean_games": 208,
+    "decisions": 56785,
+    "n_shot_over": 14761,
+    "n_kicked": 42024
   },
   "design": {
     "universe": "ball-handler with a wide-open (>=6ft), frontcourt, reachable (<=28ft) teammate; declined=shot over him, took=kicked to him",
@@ -23,114 +23,114 @@
   "taker_calibration_kick": [
     {
       "s_bin": 0,
-      "n": 1432,
-      "mean_value": 0.7739,
-      "mean_realized": 0.9811
+      "n": 7004,
+      "mean_value": 0.774,
+      "mean_realized": 1.0181
     },
     {
       "s_bin": 1,
-      "n": 1431,
-      "mean_value": 0.9248,
-      "mean_realized": 1.0496
+      "n": 7004,
+      "mean_value": 0.9021,
+      "mean_realized": 1.0959
     },
     {
       "s_bin": 2,
-      "n": 1432,
-      "mean_value": 1.0241,
-      "mean_realized": 1.0622
+      "n": 7004,
+      "mean_value": 0.9921,
+      "mean_realized": 1.0728
     },
     {
       "s_bin": 3,
-      "n": 1431,
-      "mean_value": 1.15,
-      "mean_realized": 0.9909
+      "n": 7004,
+      "mean_value": 1.117,
+      "mean_realized": 1.0026
     },
     {
       "s_bin": 4,
-      "n": 1432,
-      "mean_value": 1.313,
-      "mean_realized": 0.9344
+      "n": 7004,
+      "mean_value": 1.243,
+      "mean_realized": 0.9784
     },
     {
       "s_bin": 5,
-      "n": 1432,
-      "mean_value": 1.4557,
-      "mean_realized": 0.9993
+      "n": 7004,
+      "mean_value": 1.3506,
+      "mean_realized": 0.9919
     }
   ],
   "cost_of_shooting_over_by_kick_value": [
     {
       "s_bin": 0,
-      "mean_value": 0.8012,
-      "n_took": 1861,
-      "n_declined": 454,
-      "mean_realized_took": 0.9962,
-      "mean_realized_declined": 1.3943,
-      "raw_cost_of_declining": -0.398
+      "mean_value": 0.7946,
+      "n_took": 8977,
+      "n_declined": 2380,
+      "mean_realized_took": 1.0261,
+      "mean_realized_declined": 1.316,
+      "raw_cost_of_declining": -0.2899
     },
     {
       "s_bin": 1,
-      "mean_value": 0.971,
-      "n_took": 1851,
-      "n_declined": 463,
-      "mean_realized_took": 1.0497,
-      "mean_realized_declined": 1.3844,
-      "raw_cost_of_declining": -0.3347
+      "mean_value": 0.9406,
+      "n_took": 8956,
+      "n_declined": 2401,
+      "mean_realized_took": 1.1029,
+      "mean_realized_declined": 1.3232,
+      "raw_cost_of_declining": -0.2203
     },
     {
       "s_bin": 2,
-      "mean_value": 1.1091,
-      "n_took": 1800,
-      "n_declined": 514,
-      "mean_realized_took": 1.0283,
-      "mean_realized_declined": 1.3132,
-      "raw_cost_of_declining": -0.2849
+      "mean_value": 1.0761,
+      "n_took": 8926,
+      "n_declined": 2431,
+      "mean_realized_took": 1.0232,
+      "mean_realized_declined": 1.283,
+      "raw_cost_of_declining": -0.2598
     },
     {
       "s_bin": 3,
-      "mean_value": 1.3015,
-      "n_took": 1630,
-      "n_declined": 684,
-      "mean_realized_took": 0.9393,
-      "mean_realized_declined": 1.3246,
-      "raw_cost_of_declining": -0.3853
+      "mean_value": 1.2355,
+      "n_took": 8058,
+      "n_declined": 3299,
+      "mean_realized_took": 0.9782,
+      "mean_realized_declined": 1.2383,
+      "raw_cost_of_declining": -0.2601
     },
     {
       "s_bin": 4,
-      "mean_value": 1.4536,
-      "n_took": 1448,
-      "n_declined": 867,
-      "mean_realized_took": 0.9917,
-      "mean_realized_declined": 1.4152,
-      "raw_cost_of_declining": -0.4235
+      "mean_value": 1.3494,
+      "n_took": 7107,
+      "n_declined": 4250,
+      "mean_realized_took": 0.9904,
+      "mean_realized_declined": 1.3151,
+      "raw_cost_of_declining": -0.3246
     }
   ],
   "adjusted_cost": {
-    "n_decisions": 11572,
-    "n_games": 42,
-    "n_took": 8590,
-    "n_declined": 2982,
-    "s_mean": 1.1273,
+    "n_decisions": 56785,
+    "n_games": 208,
+    "n_took": 42024,
+    "n_declined": 14761,
+    "s_mean": 1.0792,
     "s_high_quantile": 0.9,
-    "s_high": 1.4495,
-    "points_lost_by_declining_at_meanS": -0.3465,
+    "s_high": 1.3469,
+    "points_lost_by_declining_at_meanS": -0.2199,
     "ci_meanS": [
-      -0.4416,
-      -0.2658
+      -0.2555,
+      -0.1851
     ],
     "p_meanS": 0.0,
-    "points_lost_by_declining_at_highS": -0.3757,
+    "points_lost_by_declining_at_highS": -0.2283,
     "ci_highS": [
-      -0.4944,
-      -0.2851
+      -0.2722,
+      -0.1897
     ],
     "p_highS": 0.0,
-    "interaction_declinedxS": 0.0906,
+    "interaction_declinedxS": 0.0313,
     "ci_interaction": [
-      -0.0436,
-      0.2515
+      -0.0488,
+      0.1217
     ],
-    "p_interaction": 0.196,
+    "p_interaction": 0.456,
     "controls": [
       "epv_at_decision",
       "dist_to_rim",
@@ -144,10 +144,10 @@
     "n_boot": 500
   },
   "robustness_shot_ending": {
-    "points_lost_at_highS": -0.3145,
+    "points_lost_at_highS": -0.1743,
     "ci_highS": [
-      -0.4413,
-      -0.2126
+      -0.2258,
+      -0.1334
     ],
     "survives": false
   },
@@ -157,10 +157,10 @@
       "cost_grows_with_value": false
     },
     "pass": false,
-    "headline_points_lost_high_value": -0.3757,
+    "headline_points_lost_high_value": -0.2283,
     "headline_ci": [
-      -0.4944,
-      -0.2851
+      -0.2722,
+      -0.1897
     ],
     "verdict": "no decision-level outcome cost detected (null / underpowered / selection) \u2014 see report"
   },

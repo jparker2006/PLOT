@@ -322,7 +322,8 @@ def _player_level(looks: pl.DataFrame, named: pl.DataFrame) -> dict:
     for col in ("plot_per100", "within_role_per100"):
         r, p = stats.pearsonr(j[col].to_numpy(), y)
         out[col] = {"pearson_r": round(float(r), 4), "pearson_p": round(float(p), 6)}
-    out["caveat"] = "S-R shares S with model regret (partly mechanical); exploratory + underpowered at 42 games"
+    out["caveat"] = ("S-R shares S with model regret (partly mechanical) -> exploratory; "
+                     "the cross-fit de-circularization is the rigorous version")
     return out
 
 
