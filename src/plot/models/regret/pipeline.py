@@ -29,8 +29,6 @@ V15_COLS = [
     "sx", "sy", "dist_to_rim", "three_pt", "nearest_def_dist",
     "best_available", "post_epv", "regret_signed", "regret_clipped",
 ]
-_SHOT_ACTIONS = ["shot_make", "shot_miss"]
-_OPEN_LOOK_ACTIONS = ["pass", "shot_make", "shot_miss"]
 MAX_SHOT_FT = 30.0  # beyond this a "declined shot" is a backcourt/bring-up, not a real open look
 
 
@@ -85,43 +83,78 @@ def regret_from_intermediates(inter: dict, *, trace: pl.DataFrame, completion: f
     return pl.concat([passup.select(V15_COLS), shotsel.select(V15_COLS)])
 
 
-def open_looks_from_intermediates(inter: dict, *, trace: pl.DataFrame) -> pl.DataFrame:
-    """The open-look decision frame for G6 step 2 (outcome validity).
+_OPEN_LOOK_COLS = [
+    "game_id", "possession_id", "decision_wall_ms", "player_id", "declined", "S",
+    "dist_to_rim", "three_pt", "nearest_def_dist", "fg_points",
+]
 
-    One row per OPEN ball-handler (nearest defender ≥ ``OPEN_FT``, frontcourt ``≤ MAX_SHOT_FT``) who
-    either TOOK the look (terminal shot ⇒ ``declined=0``) or DECLINED it (pass ⇒ ``declined=1``).
-    Carries the own open-shot model value ``S`` (xPoints at actual contest), the REALIZED possession
-    points ``R``, the model's possession value at the decision ``epv_at_decision``, plus location /
-    openness / team for the matched outcome test. Realized points come at the possession's terminal
-    action, so ``R`` (possession total) is the realized value from the decision onward."""
+
+def open_looks_from_intermediates(inter: dict, *, trace: pl.DataFrame) -> pl.DataFrame:
+    """The open-look decision frame for G6 step 2 (outcome validity), shooter-attributed.
+
+    One row per OPEN offensive player (nearest defender ≥ ``OPEN_FT``, frontcourt ``≤ MAX_SHOT_FT``)
+    who either TOOK the look or DECLINED it:
+
+    * **takers** (``declined=0``) are the REAL PBP shots (``extract_shots`` → the ``PLAYER1`` shooter
+      at release), so the decision is correctly attributed to the player who shot — not the coarse
+      tracking ball-handler at possession end. ``fg_points`` is the shot's OWN realized points (no
+      offensive-rebound inflation), used to calibrate the benchmark ``S`` cleanly.
+    * **decliners** (``declined=1``) are open ball-handlers who passed (a pass has no PBP shot event
+      to anchor, so tracking is the only source).
+
+    Carries: own open-shot model value ``S`` (xPoints at actual contest, same model both sides), the
+    REALIZED possession points ``R`` (the decision's realized value, O-rebs accruing to both groups),
+    the model EPV at the decision, location/openness, period, and ``poss_elapsed_s`` — seconds into
+    the possession, a shot-clock-pressure proxy that also controls for takers acting later than
+    decliners (a forced late pass is not a free decision)."""
+    shots, xmodel = inter["shots"], inter["xmodel"]
     parts = []
     for g in inter["clean"]:
+        rows = []
         opts = inter["opts"][g]
-        if opts.height == 0:
+        if opts.height:  # ---- decliners: open handler who passed ----
+            _, xp = predict_xpoints(xmodel, opts)
+            h = opts.with_columns(pl.Series("xpoints", xp)).filter(
+                pl.col("is_handler") & (pl.col("nearest_def_dist") >= OPEN_FT)
+                & (pl.col("dist_to_rim") <= MAX_SHOT_FT) & (pl.col("action_type") == "pass")
+            )
+            if h.height:
+                rows.append(h.select(
+                    pl.lit(g).alias("game_id"), "possession_id",
+                    pl.col("wall_clock_ms").alias("decision_wall_ms"), "player_id",
+                    pl.lit(1, dtype=pl.Int64).alias("declined"), pl.col("xpoints").alias("S"),
+                    "dist_to_rim", pl.col("three_pt").cast(pl.Int64).alias("three_pt"), "nearest_def_dist",
+                    pl.lit(None, dtype=pl.Float64).alias("fg_points"),
+                ))
+        gshots = shots.filter((pl.col("game_id") == g) & pl.col("is_open")
+                              & (pl.col("dist_to_rim") <= MAX_SHOT_FT))
+        if gshots.height:  # ---- takers: real open PBP shots ----
+            _, sxp = predict_xpoints(xmodel, gshots)
+            rows.append(gshots.with_columns(pl.Series("S", sxp)).select(
+                pl.lit(g).alias("game_id"), "possession_id",
+                pl.col("shot_wall_ms").alias("decision_wall_ms"), pl.col("shooter_id").alias("player_id"),
+                pl.lit(0, dtype=pl.Int64).alias("declined"), "S",
+                "dist_to_rim", pl.col("three_pt").cast(pl.Int64).alias("three_pt"), "nearest_def_dist",
+                pl.col("fg_points").cast(pl.Float64).alias("fg_points"),
+            ))
+        if not rows:
             continue
-        _, xp = predict_xpoints(inter["xmodel"], opts)
-        opts = opts.with_columns(pl.Series("xpoints", xp))
-        handler = opts.filter(
-            pl.col("is_handler") & (pl.col("nearest_def_dist") >= OPEN_FT)
-            & (pl.col("dist_to_rim") <= MAX_SHOT_FT)
-            & pl.col("action_type").is_in(_OPEN_LOOK_ACTIONS)
-        )
-        if handler.height == 0:
-            continue
-        h = handler.select(
-            pl.lit(g).alias("game_id"), "possession_id", "action_idx", "wall_clock_ms",
-            "player_id", "offense_team_id",
-            pl.col("action_type").is_in(_SHOT_ACTIONS).not_().cast(pl.Int64).alias("declined"),
-            pl.col("xpoints").alias("S"),
-            "dist_to_rim", pl.col("three_pt").cast(pl.Int64).alias("three_pt"), "nearest_def_dist",
-        )
+        base = pl.concat([r.select(_OPEN_LOOK_COLS) for r in rows])
         poss = inter["poss"][g].select(
-            "possession_id", pl.col("points").cast(pl.Float64).alias("R"), "period", "end_reason")
-        h = h.join(poss, on="possession_id", how="left")
+            "possession_id", pl.col("points").cast(pl.Float64).alias("R"), "period", "end_reason",
+            "offense_team_id")
+        poss_start = inter["actions"][g].group_by("possession_id").agg(
+            pl.col("start_wall_ms").min().alias("poss_start_wall"))
         tr = trace.filter(pl.col("game_id") == g).select(
-            "possession_id", "wall_clock_ms", pl.col("epv").alias("epv_at_decision"))
-        h = h.join(tr, on=["possession_id", "wall_clock_ms"], how="left")
-        parts.append(h)
+            "possession_id", pl.col("wall_clock_ms").alias("decision_wall_ms"),
+            pl.col("epv").alias("epv_at_decision"))
+        parts.append(
+            base.join(poss, on="possession_id", how="left")
+            .join(poss_start, on="possession_id", how="left")
+            .join(tr, on=["possession_id", "decision_wall_ms"], how="left")
+            .with_columns(((pl.col("decision_wall_ms") - pl.col("poss_start_wall")) / 1000.0)
+                          .clip(0.0, 24.0).alias("poss_elapsed_s"))
+        )
     return pl.concat(parts)
 
 

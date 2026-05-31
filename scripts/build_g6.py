@@ -51,7 +51,8 @@ from plot.models.regret.pipeline import (  # noqa: E402
 )
 from plot.models.regret.plot_metric import split_half_stability  # noqa: E402
 
-OPEN_LOOK_CONTROLS = ["epv_at_decision", "dist_to_rim", "three_pt", "nearest_def_dist"]
+OPEN_LOOK_CONTROLS = ["epv_at_decision", "dist_to_rim", "three_pt", "nearest_def_dist",
+                      "poss_elapsed_s", "period"]
 
 MIN_DECISIONS = 30
 MIN_PER_HALF = 15
@@ -148,11 +149,14 @@ def main() -> None:
     print(f"  wrote {out}/g6_step1.json + {args.per_player_out}")
 
     # ===================== STEP 2 — outcome validity (the keystone) =====================
-    looks = open_looks_from_intermediates(inter, trace=trace).drop_nulls(["R", "epv_at_decision", "S"])
+    looks = open_looks_from_intermediates(inter, trace=trace).drop_nulls(
+        ["R", "epv_at_decision", "S", "poss_elapsed_s"])
     n_took = int((looks["declined"] == 0).sum())
     n_dec = int((looks["declined"] == 1).sum())
     print(f"\nopen-look decisions: {looks.height} (took {n_took}, declined {n_dec})")
 
+    # calibrate the benchmark S two ways: vs the shot's OWN points (clean) and vs possession points
+    calib_fg = taker_calibration(looks, outcome_col="fg_points", n_bins=8)
     calib = taker_calibration(looks, n_bins=8)
     cbv = cost_of_declining_by_value(looks, n_bins=6)
     adj = adjusted_decline_cost(looks, controls=OPEN_LOOK_CONTROLS, n_boot=500, seed=0)
@@ -174,7 +178,8 @@ def main() -> None:
                                "or declined (pass) the look", "outcome": "realized possession points R",
                    "benchmark": "S = own open-shot xPoints at actual contest", "controls": OPEN_LOOK_CONTROLS,
                    "team_fe": True, "inference": "game-cluster bootstrap"},
-        "taker_calibration": calib,
+        "taker_calibration_fg_points": calib_fg,
+        "taker_calibration_possession": calib,
         "cost_of_declining_by_value": cbv,
         "adjusted_decline_cost": adj,
         "robustness_shot_ending_possessions": {
@@ -198,10 +203,12 @@ def main() -> None:
         ],
     }
     (out / "g6_step2.json").write_text(json.dumps(report2, indent=2))
-    _plot_step2(calib, cbv, adj, out)
+    _plot_step2(calib_fg, cbv, adj, out)
 
     print("=== G6 step 2 — outcome validity (decision-level keystone) ===")
-    print("  taker calibration value→realized: "
+    print("  taker calib S→own-shot pts (clean): "
+          + ", ".join(f"{c['mean_value']:.2f}->{c['mean_realized']:.2f}" for c in calib_fg))
+    print("  taker calib S→possession pts: "
           + ", ".join(f"{c['mean_value']:.2f}->{c['mean_realized']:.2f}" for c in calib))
     print("  raw cost of declining by S-bin: "
           + ", ".join(f"{r['mean_value']:.2f}:{r['raw_cost_of_declining']:+.3f}" for r in cbv))
@@ -273,7 +280,7 @@ def _plot_step2(calib: list[dict], cbv: list[dict], adj: dict, out: Path) -> Non
         ax[0].scatter(mv, mr, s=28, color="#2c3e50", zorder=3)
         lo, hi = min(mv + mr), max(mv + mr)
         ax[0].plot([lo, hi], [lo, hi], "--", color="#aaaaaa", lw=1)
-        ax[0].set(xlabel="model open-shot value S (xPoints)", ylabel="realized points when TAKEN",
+        ax[0].set(xlabel="model open-shot value S (xPoints)", ylabel="realized own-shot points when TAKEN",
                   title="taker calibration: is S a fair benchmark?")
     if cbv:
         mv = [r["mean_value"] for r in cbv]

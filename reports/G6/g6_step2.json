@@ -1,8 +1,8 @@
 {
   "corpus": {
     "clean_games": 42,
-    "open_look_decisions": 15287,
-    "n_took": 1200,
+    "open_look_decisions": 16448,
+    "n_took": 2361,
     "n_declined": 14087
   },
   "design": {
@@ -13,164 +13,218 @@
       "epv_at_decision",
       "dist_to_rim",
       "three_pt",
-      "nearest_def_dist"
+      "nearest_def_dist",
+      "poss_elapsed_s",
+      "period"
     ],
     "team_fe": true,
     "inference": "game-cluster bootstrap"
   },
-  "taker_calibration": [
+  "taker_calibration_fg_points": [
     {
       "s_bin": 0,
-      "n": 150,
-      "mean_value": 0.8413,
-      "mean_realized": 1.14
+      "n": 295,
+      "mean_value": 0.7634,
+      "mean_realized": 0.7186
     },
     {
       "s_bin": 1,
-      "n": 150,
-      "mean_value": 0.9602,
-      "mean_realized": 1.2333
+      "n": 295,
+      "mean_value": 0.8567,
+      "mean_realized": 0.8237
     },
     {
       "s_bin": 2,
-      "n": 150,
-      "mean_value": 1.0493,
-      "mean_realized": 1.2
+      "n": 295,
+      "mean_value": 0.9427,
+      "mean_realized": 0.9763
     },
     {
       "s_bin": 3,
-      "n": 150,
-      "mean_value": 1.1083,
-      "mean_realized": 1.5667
+      "n": 295,
+      "mean_value": 1.0079,
+      "mean_realized": 0.9492
     },
     {
       "s_bin": 4,
-      "n": 150,
-      "mean_value": 1.1591,
-      "mean_realized": 1.4733
+      "n": 295,
+      "mean_value": 1.0626,
+      "mean_realized": 1.1966
     },
     {
       "s_bin": 5,
-      "n": 150,
-      "mean_value": 1.2233,
-      "mean_realized": 1.48
+      "n": 295,
+      "mean_value": 1.1332,
+      "mean_realized": 1.1966
     },
     {
       "s_bin": 6,
-      "n": 150,
-      "mean_value": 1.3319,
-      "mean_realized": 1.5467
+      "n": 295,
+      "mean_value": 1.2093,
+      "mean_realized": 1.5492
     },
     {
       "s_bin": 7,
-      "n": 150,
-      "mean_value": 1.6962,
-      "mean_realized": 1.7133
+      "n": 296,
+      "mean_value": 1.4922,
+      "mean_realized": 1.3378
+    }
+  ],
+  "taker_calibration_possession": [
+    {
+      "s_bin": 0,
+      "n": 295,
+      "mean_value": 0.7634,
+      "mean_realized": 0.8475
+    },
+    {
+      "s_bin": 1,
+      "n": 295,
+      "mean_value": 0.8567,
+      "mean_realized": 0.9729
+    },
+    {
+      "s_bin": 2,
+      "n": 295,
+      "mean_value": 0.9427,
+      "mean_realized": 1.1186
+    },
+    {
+      "s_bin": 3,
+      "n": 295,
+      "mean_value": 1.0079,
+      "mean_realized": 1.0847
+    },
+    {
+      "s_bin": 4,
+      "n": 295,
+      "mean_value": 1.0626,
+      "mean_realized": 1.3525
+    },
+    {
+      "s_bin": 5,
+      "n": 295,
+      "mean_value": 1.1332,
+      "mean_realized": 1.3559
+    },
+    {
+      "s_bin": 6,
+      "n": 295,
+      "mean_value": 1.2093,
+      "mean_realized": 1.722
+    },
+    {
+      "s_bin": 7,
+      "n": 296,
+      "mean_value": 1.4922,
+      "mean_realized": 1.5574
     }
   ],
   "cost_of_declining_by_value": [
     {
       "s_bin": 0,
-      "mean_value": 0.8221,
-      "n_took": 143,
-      "n_declined": 2405,
-      "mean_realized_took": 1.1538,
-      "mean_realized_declined": 0.9676,
-      "raw_cost_of_declining": 0.1863
+      "mean_value": 0.8113,
+      "n_took": 565,
+      "n_declined": 2177,
+      "mean_realized_took": 0.9009,
+      "mean_realized_declined": 0.96,
+      "raw_cost_of_declining": -0.0592
     },
     {
       "s_bin": 1,
-      "mean_value": 0.9718,
-      "n_took": 189,
-      "n_declined": 2359,
-      "mean_realized_took": 1.1429,
-      "mean_realized_declined": 0.9631,
-      "raw_cost_of_declining": 0.1797
+      "mean_value": 0.9578,
+      "n_took": 501,
+      "n_declined": 2240,
+      "mean_realized_took": 1.0958,
+      "mean_realized_declined": 0.9638,
+      "raw_cost_of_declining": 0.132
     },
     {
       "s_bin": 2,
-      "mean_value": 1.0786,
-      "n_took": 254,
-      "n_declined": 2293,
-      "mean_realized_took": 1.4528,
-      "mean_realized_declined": 1.0222,
-      "raw_cost_of_declining": 0.4305
+      "mean_value": 1.0621,
+      "n_took": 464,
+      "n_declined": 2277,
+      "mean_realized_took": 1.2888,
+      "mean_realized_declined": 1.0211,
+      "raw_cost_of_declining": 0.2677
     },
     {
       "s_bin": 3,
-      "mean_value": 1.1834,
-      "n_took": 272,
-      "n_declined": 2276,
-      "mean_realized_took": 1.4118,
-      "mean_realized_declined": 1.0927,
-      "raw_cost_of_declining": 0.3191
+      "mean_value": 1.1662,
+      "n_took": 446,
+      "n_declined": 2295,
+      "mean_realized_took": 1.5381,
+      "mean_realized_declined": 1.0553,
+      "raw_cost_of_declining": 0.4828
     },
     {
       "s_bin": 4,
-      "mean_value": 1.3056,
-      "n_took": 170,
-      "n_declined": 2378,
-      "mean_realized_took": 1.6824,
-      "mean_realized_declined": 1.1749,
-      "raw_cost_of_declining": 0.5074
+      "mean_value": 1.2881,
+      "n_took": 228,
+      "n_declined": 2513,
+      "mean_realized_took": 1.5877,
+      "mean_realized_declined": 1.201,
+      "raw_cost_of_declining": 0.3868
     },
     {
       "s_bin": 5,
-      "mean_value": 1.6396,
-      "n_took": 172,
-      "n_declined": 2376,
-      "mean_realized_took": 1.6453,
-      "mean_realized_declined": 1.08,
-      "raw_cost_of_declining": 0.5654
+      "mean_value": 1.6206,
+      "n_took": 157,
+      "n_declined": 2585,
+      "mean_realized_took": 1.5987,
+      "mean_realized_declined": 1.0739,
+      "raw_cost_of_declining": 0.5248
     }
   ],
   "adjusted_decline_cost": {
-    "n_decisions": 15287,
+    "n_decisions": 16448,
     "n_games": 42,
-    "n_took": 1200,
+    "n_took": 2361,
     "n_declined": 14087,
-    "s_mean": 1.1669,
+    "s_mean": 1.151,
     "s_high_quantile": 0.9,
-    "s_high": 1.5771,
-    "points_lost_by_declining_at_meanS": 0.3593,
+    "s_high": 1.552,
+    "points_lost_by_declining_at_meanS": 0.2242,
     "ci_meanS": [
-      0.2788,
-      0.451
+      0.1736,
+      0.2779
     ],
     "p_meanS": 0.0,
-    "points_lost_by_declining_at_highS": 0.5032,
+    "points_lost_by_declining_at_highS": 0.4709,
     "ci_highS": [
-      0.3478,
-      0.669
+      0.3371,
+      0.615
     ],
     "p_highS": 0.0,
-    "interaction_declinedxS": -0.3507,
+    "interaction_declinedxS": -0.6152,
     "ci_interaction": [
-      -0.6677,
-      -0.0655
+      -0.89,
+      -0.3694
     ],
-    "p_interaction": 0.024,
+    "p_interaction": 0.0,
     "controls": [
       "epv_at_decision",
       "dist_to_rim",
       "three_pt",
-      "nearest_def_dist"
+      "nearest_def_dist",
+      "poss_elapsed_s",
+      "period"
     ],
     "team_fe": true,
     "n_boot": 500
   },
   "robustness_shot_ending_possessions": {
     "note": "possessions that ended in a FGA (no turnovers); same structural position for both groups",
-    "n_decisions": 11804,
-    "n_took": 1200,
+    "n_decisions": 12902,
+    "n_took": 2298,
     "n_declined": 10604,
-    "points_lost_at_highS": 0.4914,
+    "points_lost_at_highS": 0.4695,
     "ci_highS": [
-      0.3043,
-      0.6922
+      0.3389,
+      0.6213
     ],
     "p_highS": 0.0,
-    "interaction": -0.4116,
+    "interaction": -0.7224,
     "survives": true
   },
   "gate": {
@@ -179,10 +233,10 @@
       "cost_grows_with_value": true
     },
     "pass": true,
-    "headline_points_lost_high_value": 0.5032,
+    "headline_points_lost_high_value": 0.4709,
     "headline_ci": [
-      0.3478,
-      0.669
+      0.3371,
+      0.615
     ],
     "verdict": "declining valuable open looks costs real points \u2014 the regret signal is outcome-valid at the decision level"
   },

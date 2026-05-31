@@ -68,47 +68,52 @@ nobody within 4 ft either takes the shot or declines it (passes). We observe REA
 points for *both* choices, so the counterfactual "what taking would have yielded" comes from real
 shooters at matched situations, not the model.
 
-**Method.** 15,287 open-handler decisions (42 games), each labelled `declined` (passed, 14,087) vs
-`took` (terminal shot, 1,200), with the own open-shot model value `S` (xPoints at actual contest),
-the REALIZED possession points `R`, and observable controls (model EPV at the decision, location,
-openness) + team fixed effects. Inference by **game-cluster bootstrap**.
-`src/plot/eval/outcome_validity.py` + `scripts/build_g6.py`; unit-tested in `tests/test_outcome_validity.py`.
+**Method (hardened).** 16,448 open-offensive-player decisions (42 games): `declined` (open handler
+passed, 14,087) vs `took` (2,361). **Takers are the real PBP shots** (`extract_shots` → the
+`PLAYER1` shooter at release), so the decision is attributed to the player who actually shot — not
+the coarse tracking ball-handler at possession end — and the shot's own points `fg_points` calibrate
+the benchmark cleanly. Benchmark `S` = own open-shot xPoints (same model both sides). Outcome `R` =
+realized possession points. Controls: model EPV at the decision, location, openness, **seconds into
+the possession** (shot-clock-pressure proxy — also corrects for takers acting later than decliners),
+period, + team fixed effects. Inference by **game-cluster bootstrap**. `src/plot/eval/outcome_validity.py`
++ `src/plot/models/regret/pipeline.py` + `scripts/build_g6.py`; unit-tested in `tests/test_outcome_validity.py`.
 
 **Result — the regret signal is outcome-valid at the decision level.**
 
 | readout | value | reading |
 |---|---|---|
-| raw cost of declining, by look value `S` | +0.19 → **+0.57** as S: 0.82→1.64 | declining a *better* look costs *more* — the dose-response regret predicts |
-| adjusted points lost by declining, mean S | **0.36** [0.28, 0.45], p≈0 | net of observables + team |
-| adjusted points lost, high-value look (S≈1.58) | **0.50** [0.35, 0.67], p≈0 | passing up a great open look costs ~½ pt |
-| `declined × S` interaction | **−0.35** [−0.67, −0.07] | cost grows with look value (CI excludes 0) |
-| **robustness: shot-ending possessions only** (no TOs) | **0.49** [0.30, 0.69], survives ✓ | not turnover-exposure — a *worse downstream shot* |
+| taker calibration, `S` → own-shot points | 0.76→0.72, 0.94→0.98, 1.21→1.55 … | `S` is a fair benchmark (≈ diagonal once shooter-attributed) |
+| raw cost of declining, by look value `S` | **−0.06** (bad look) → **+0.53** (great look) | declining a *bad* look is free; a *good* look is costly — exactly regret's logic |
+| adjusted points lost, average look | **0.22** [0.17, 0.28], p≈0 | net of observables + clock + team |
+| adjusted points lost, high-value look (S≈1.55) | **0.47** [0.34, 0.62], p≈0 | passing up a great open look costs ~½ pt |
+| `declined × S` interaction | **−0.62** [−0.89, −0.37] | cost grows sharply with look value (CI excludes 0) |
+| **robustness: shot-ending possessions only** (no TOs) | **0.47** [0.34, 0.62], survives ✓ | not turnover-exposure — a *worse downstream shot* |
 
 **Why it's not an artifact.**
-* **Dose-response.** The cost scales with the model's shot value `S` — exactly what regret predicts,
-  and hard to produce with simple selection (a pure pool-composition confound would be ~flat in `S`).
-* **Turnover-exposure ruled out.** Restricting to possessions that ended in a field-goal attempt
-  (both groups same structural position) the cost barely moves (0.50→0.49, CI still excludes 0). So
-  it isn't "passing risks turnovers" — declining a good look yields a genuinely *worse* shot later.
-* **Against selection-on-unobservables.** If decliners passed because they saw a better play
-  developing, their realized outcome should be *better*; it's *worse*. So on average these declines
-  weren't justified by unobserved options (individual ones may be).
+* **Dose-response.** The cost scales with `S` — exactly what regret predicts. The hardened cut makes
+  it cleaner still: declining a *low-value* look costs ≈0 (−0.06), the cost only appears for good
+  looks. A pool-composition confound would be ~flat in `S`; this isn't.
+* **Benchmark validated.** With proper shooter attribution, takers realize ≈ `S` in their own shot
+  points (the earlier "realized > S" anomaly was offensive-rebound putbacks in possession `R` + coarse
+  attribution — both now addressed). So `S` is a fair yardstick, and the magnitude is no longer just
+  an upper bound.
+* **Clock & timing controlled.** Adding seconds-into-possession (a forced late pass is not a free
+  choice; takers shoot later than decliners) *lowered* the average cost 0.36→0.22 — the honest number
+  — while the high-value cost held (~0.47) and the dose-response sharpened.
+* **Turnover-exposure ruled out.** Shot-ending-only (both groups same structural position): 0.47, CI
+  excludes 0. Declining a good look yields a genuinely *worse* shot, not just turnover risk.
+* **Against selection-on-unobservables.** If decliners passed because they saw a better play, their
+  realized outcome should be *better*; it's *worse*. So on average these declines weren't justified by
+  unobserved options (individual ones may be) — bounded, not eliminated (the standing G5b limitation).
 
-**Honest caveats (in the report).**
-* **Magnitude is an upper bound.** Taker calibration shows realized > model value `S` (0.84→1.14, …)
-  because possession-level `R` counts offensive-rebound putbacks and the terminal action is
-  attributed coarsely to the tracking handler. The robust claims are the **sign** and the
-  **dose-response**, not the exact 0.5-point figure.
-* **Selection on unobservables** is *bounded* (we condition on the model's EPV at the decision +
-  openness/location) but never fully eliminated — the standing G5b limitation.
-* **Player-level (exploratory, stretch).** Per-player model PLOT and the within-role residual
-  correlate with a player's realized decline-shortfall (r≈0.22 / **0.27**, p<0.001, n=239) — but
-  `S−R` shares `S` with regret (partly mechanical) and 42 games is thin. Suggestive, not a gate. The
-  cleaner player-level test (PLOT → team offense beyond box) is what step 3's scale-up would power.
+**Still soft — the player level.** Per-player model PLOT / within-role residual correlate with a
+player's realized decline-shortfall (r≈0.22 / **0.27**, p<0.001, n=239), but `S−R` shares `S` with
+regret (partly mechanical) and 42 games is thin. Suggestive, not a gate. The cleaner player-level
+test (PLOT → team offense beyond box) is what the **208-game scale-up** would power.
 
-**Verdict.** **G6 PASSES at the decision level** — the minimum bar for the paper's central claim.
-*Players systematically leave points by declining open looks; the cost is measurable, scales with how
-good the look was, survives removing turnover-risk, and is invisible to the box score.* The
-player-level attribution and the exact magnitude are where more data (step 3) would help; the
-decision-level finding is real and defensible now.
+**Verdict.** **G6 PASSES at the decision level**, and the hardened analysis strengthens it: *players
+systematically leave points by declining good open looks — ≈0.22 on an average look, ≈0.47 on a great
+one; declining a bad look is free; the effect survives removing turnover-risk, clock pressure, and
+team quality; and it is invisible to the box score.* The exact player-level attribution is where the
+208-game run comes in; the decision-level finding is real and defensible now.
 
