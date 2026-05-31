@@ -227,6 +227,22 @@
     "interaction": -0.7224,
     "survives": true
   },
+  "robustness_clean_decliner_pool": {
+    "note": "drop decliners whose handler took a PBP shot that possession (mis-typed-shot guard)",
+    "n_decliners_dropped": 4076,
+    "points_lost_at_meanS": 0.2408,
+    "ci_meanS": [
+      0.188,
+      0.2946
+    ],
+    "points_lost_at_highS": 0.4731,
+    "ci_highS": [
+      0.3512,
+      0.6025
+    ],
+    "interaction": -0.7141,
+    "survives": true
+  },
   "gate": {
     "gate": {
       "high_value_decline_costs_points": true,

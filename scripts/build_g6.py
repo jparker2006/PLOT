@@ -173,6 +173,20 @@ def main() -> None:
     survives_shotend = bool(adj_shotend["points_lost_by_declining_at_highS"] > 0
                             and adj_shotend["ci_highS"][0] > 0)
 
+    # de-risk: the action layer can mis-type a handler's own missed shot (miss->oreb) as a "pass",
+    # contaminating the DECLINED pool with players who actually shot. Drop any decliner whose handler
+    # took a PBP shot in that possession (keep all takers); a clean pass-up never shoots that trip.
+    shooter_keys = inter["shots"].select(
+        "game_id", "possession_id", pl.col("shooter_id").alias("player_id")).unique().with_columns(
+        pl.lit(True).alias("_handler_shot"))
+    looks_marked = looks.join(shooter_keys, on=["game_id", "possession_id", "player_id"], how="left").with_columns(
+        pl.col("_handler_shot").fill_null(False))
+    n_contam = int(((looks_marked["declined"] == 1) & looks_marked["_handler_shot"]).sum())
+    clean_looks = looks_marked.filter((pl.col("declined") == 0) | (~pl.col("_handler_shot")))
+    adj_clean = adjusted_decline_cost(clean_looks, controls=OPEN_LOOK_CONTROLS, n_boot=500, seed=0)
+    survives_clean = bool(adj_clean["points_lost_by_declining_at_highS"] > 0
+                          and adj_clean["ci_highS"][0] > 0)
+
     report2 = {
         "corpus": {"clean_games": len(clean), "open_look_decisions": looks.height,
                    "n_took": n_took, "n_declined": n_dec},
@@ -191,6 +205,13 @@ def main() -> None:
             "points_lost_at_highS": adj_shotend["points_lost_by_declining_at_highS"],
             "ci_highS": adj_shotend["ci_highS"], "p_highS": adj_shotend["p_highS"],
             "interaction": adj_shotend["interaction_declinedxS"], "survives": survives_shotend,
+        },
+        "robustness_clean_decliner_pool": {
+            "note": "drop decliners whose handler took a PBP shot that possession (mis-typed-shot guard)",
+            "n_decliners_dropped": n_contam,
+            "points_lost_at_meanS": adj_clean["points_lost_by_declining_at_meanS"], "ci_meanS": adj_clean["ci_meanS"],
+            "points_lost_at_highS": adj_clean["points_lost_by_declining_at_highS"], "ci_highS": adj_clean["ci_highS"],
+            "interaction": adj_clean["interaction_declinedxS"], "survives": survives_clean,
         },
         "gate": ov_gate,
         "player_level_exploratory": player_lv,
@@ -222,6 +243,9 @@ def main() -> None:
     print(f"  ROBUSTNESS (shot-ending possessions only, no TOs): highS lost "
           f"{adj_shotend['points_lost_by_declining_at_highS']} CI{adj_shotend['ci_highS']} "
           f"survives={survives_shotend} (n_took={adj_shotend['n_took']}, n_dec={adj_shotend['n_declined']})")
+    print(f"  DE-RISK (clean decliner pool, dropped {n_contam} mis-typed): meanS lost "
+          f"{adj_clean['points_lost_by_declining_at_meanS']} CI{adj_clean['ci_meanS']} | highS "
+          f"{adj_clean['points_lost_by_declining_at_highS']} CI{adj_clean['ci_highS']} survives={survives_clean}")
     print(f"  player-level (exploratory): {player_lv}")
     print(f"  GATE: {ov_gate['gate']} PASS={ov_gate['pass']}")
     print(f"  VERDICT: {ov_gate['verdict']}")

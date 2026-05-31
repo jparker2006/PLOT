@@ -105,6 +105,11 @@ period, + team fixed effects. Inference by **game-cluster bootstrap**. `src/plot
 * **Against selection-on-unobservables.** If decliners passed because they saw a better play, their
   realized outcome should be *better*; it's *worse*. So on average these declines weren't justified by
   unobserved options (individual ones may be) — bounded, not eliminated (the standing G5b limitation).
+* **Not a segmentation artifact.** The action layer can mis-type a handler's own missed shot
+  (miss→offensive-rebound) as a "pass," contaminating the declined pool. Dropping every decliner whose
+  handler took a PBP shot that possession (4,076 rows, ~29%) barely moves the estimate — 0.24 [0.19,
+  0.29] mean / 0.47 [0.35, 0.60] high-value, survives — so the result is not driven by mis-typing, and
+  the full action-layer refactor is unnecessary for this claim.
 
 **Still soft — the player level.** Per-player model PLOT / within-role residual correlate with a
 player's realized decline-shortfall (r≈0.22 / **0.27**, p<0.001, n=239), but `S−R` shares `S` with

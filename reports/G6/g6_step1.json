@@ -91,213 +91,213 @@
       "player_name": "Tiago Splitter",
       "n_decisions": 59,
       "plot_per100": 23.565699963935163,
-      "role_per100": 19.213908597409393,
-      "within_role_per100": 4.351791366525768
+      "role_per100": 19.21390859740939,
+      "within_role_per100": 4.351791366525772
     },
     {
       "player_name": "Luc Mbah a Moute",
       "n_decisions": 46,
-      "plot_per100": 22.643235560231787,
-      "role_per100": 11.233556052519242,
-      "within_role_per100": 11.409679507712546
+      "plot_per100": 22.643235560231783,
+      "role_per100": 11.233556052519237,
+      "within_role_per100": 11.409679507712545
     },
     {
       "player_name": "John Henson",
       "n_decisions": 58,
-      "plot_per100": 22.376463505281315,
-      "role_per100": 13.162330550822382,
-      "within_role_per100": 9.214132954458934
+      "plot_per100": 22.37646350528131,
+      "role_per100": 13.162330550822379,
+      "within_role_per100": 9.21413295445893
     },
     {
       "player_name": "JJ Hickson",
       "n_decisions": 81,
       "plot_per100": 22.177649884516484,
-      "role_per100": 13.715334199349382,
-      "within_role_per100": 8.462315685167104
+      "role_per100": 13.71533419934938,
+      "within_role_per100": 8.462315685167107
     },
     {
       "player_name": "Marcin Gortat",
       "n_decisions": 44,
-      "plot_per100": 21.849856098080327,
+      "plot_per100": 21.84985609808032,
       "role_per100": 17.057967233761765,
-      "within_role_per100": 4.79188886431856
+      "within_role_per100": 4.791888864318558
     },
     {
       "player_name": "Steven Adams",
       "n_decisions": 76,
       "plot_per100": 21.60375886934683,
-      "role_per100": 17.13207477812674,
-      "within_role_per100": 4.471684091220089
+      "role_per100": 17.132074778126736,
+      "within_role_per100": 4.471684091220097
     },
     {
       "player_name": "Aron Baynes",
       "n_decisions": 66,
-      "plot_per100": 21.28375476068087,
-      "role_per100": 18.66969304309392,
-      "within_role_per100": 2.614061717586954
+      "plot_per100": 21.283754760680875,
+      "role_per100": 18.669693043093915,
+      "within_role_per100": 2.6140617175869614
     },
     {
       "player_name": "Zaza Pachulia",
       "n_decisions": 46,
-      "plot_per100": 21.230195690332636,
-      "role_per100": 12.418926437318099,
-      "within_role_per100": 8.811269253014537
+      "plot_per100": 21.230195690332625,
+      "role_per100": 12.418926437318097,
+      "within_role_per100": 8.811269253014533
     },
     {
       "player_name": "Nick Collison",
       "n_decisions": 30,
-      "plot_per100": 21.06592753655862,
+      "plot_per100": 21.065927536558622,
       "role_per100": 16.26989628332701,
-      "within_role_per100": 4.7960312532316065
+      "within_role_per100": 4.796031253231614
     },
     {
       "player_name": "Hassan Whiteside",
       "n_decisions": 94,
       "plot_per100": 20.899034247343636,
-      "role_per100": 14.33773918303389,
-      "within_role_per100": 6.561295064309746
+      "role_per100": 14.337739183033884,
+      "within_role_per100": 6.561295064309751
     },
     {
       "player_name": "Taj Gibson",
       "n_decisions": 49,
-      "plot_per100": 20.585686329588526,
-      "role_per100": 15.324566218510224,
-      "within_role_per100": 5.2611201110783
+      "plot_per100": 20.58568632958853,
+      "role_per100": 15.324566218510222,
+      "within_role_per100": 5.261120111078308
     },
     {
       "player_name": "Al Jefferson",
       "n_decisions": 68,
       "plot_per100": 20.572888842009977,
-      "role_per100": 15.040144432582894,
-      "within_role_per100": 5.532744409427084
+      "role_per100": 15.040144432582892,
+      "within_role_per100": 5.532744409427087
     },
     {
       "player_name": "Kostas Papanikolaou",
       "n_decisions": 32,
-      "plot_per100": 20.20531132112289,
+      "plot_per100": 20.20531132112288,
       "role_per100": 11.989860836321832,
-      "within_role_per100": 8.215450484801053
+      "within_role_per100": 8.21545048480105
     },
     {
       "player_name": "Jonas Jerebko",
       "n_decisions": 89,
       "plot_per100": 20.008005697860064,
       "role_per100": 13.939409489320646,
-      "within_role_per100": 6.068596208539419
+      "within_role_per100": 6.06859620853942
     },
     {
       "player_name": "Kenneth Faried",
       "n_decisions": 61,
-      "plot_per100": 19.80410269157994,
-      "role_per100": 17.55718125036713,
-      "within_role_per100": 2.2469214412128116
+      "plot_per100": 19.804102691579942,
+      "role_per100": 17.557181250367126,
+      "within_role_per100": 2.246921441212815
     }
   ],
   "leaderboard_top15_by_within_role": [
     {
       "player_name": "Luc Mbah a Moute",
       "n_decisions": 46,
-      "plot_per100": 22.643235560231787,
-      "role_per100": 11.233556052519242,
-      "within_role_per100": 11.409679507712546
+      "plot_per100": 22.643235560231783,
+      "role_per100": 11.233556052519237,
+      "within_role_per100": 11.409679507712545
     },
     {
       "player_name": "Seth Curry",
       "n_decisions": 41,
-      "plot_per100": 15.527023705713264,
-      "role_per100": 5.368814914238631,
-      "within_role_per100": 10.158208791474632
+      "plot_per100": 15.527023705713258,
+      "role_per100": 5.368814914238629,
+      "within_role_per100": 10.158208791474628
     },
     {
       "player_name": "John Henson",
       "n_decisions": 58,
-      "plot_per100": 22.376463505281315,
-      "role_per100": 13.162330550822382,
-      "within_role_per100": 9.214132954458934
+      "plot_per100": 22.37646350528131,
+      "role_per100": 13.162330550822379,
+      "within_role_per100": 9.21413295445893
     },
     {
       "player_name": "Zaza Pachulia",
       "n_decisions": 46,
-      "plot_per100": 21.230195690332636,
-      "role_per100": 12.418926437318099,
-      "within_role_per100": 8.811269253014537
+      "plot_per100": 21.230195690332625,
+      "role_per100": 12.418926437318097,
+      "within_role_per100": 8.811269253014533
     },
     {
       "player_name": "JJ Hickson",
       "n_decisions": 81,
       "plot_per100": 22.177649884516484,
-      "role_per100": 13.715334199349382,
-      "within_role_per100": 8.462315685167104
+      "role_per100": 13.71533419934938,
+      "within_role_per100": 8.462315685167107
     },
     {
       "player_name": "Kostas Papanikolaou",
       "n_decisions": 32,
-      "plot_per100": 20.20531132112289,
+      "plot_per100": 20.20531132112288,
       "role_per100": 11.989860836321832,
-      "within_role_per100": 8.215450484801053
+      "within_role_per100": 8.21545048480105
     },
     {
       "player_name": "Jabari Parker",
       "n_decisions": 75,
-      "plot_per100": 15.978503262585367,
-      "role_per100": 8.699533120067386,
-      "within_role_per100": 7.278970142517981
+      "plot_per100": 15.978503262585361,
+      "role_per100": 8.699533120067384,
+      "within_role_per100": 7.278970142517978
     },
     {
       "player_name": "Ramon Sessions",
       "n_decisions": 30,
-      "plot_per100": 14.459547546790455,
-      "role_per100": 7.328346943938384,
-      "within_role_per100": 7.131200602852071
+      "plot_per100": 14.459547546790452,
+      "role_per100": 7.328346943938382,
+      "within_role_per100": 7.131200602852069
     },
     {
       "player_name": "Robert Covington",
       "n_decisions": 77,
-      "plot_per100": 14.783821162254334,
-      "role_per100": 7.74805903992786,
-      "within_role_per100": 7.0357621223264735
+      "plot_per100": 14.783821162254323,
+      "role_per100": 7.748059039927859,
+      "within_role_per100": 7.0357621223264655
     },
     {
       "player_name": "Doug McDermott",
       "n_decisions": 49,
-      "plot_per100": 14.836947044165951,
-      "role_per100": 8.236572497961046,
-      "within_role_per100": 6.600374546204907
+      "plot_per100": 14.836947044165946,
+      "role_per100": 8.236572497961044,
+      "within_role_per100": 6.600374546204904
     },
     {
       "player_name": "Hassan Whiteside",
       "n_decisions": 94,
       "plot_per100": 20.899034247343636,
-      "role_per100": 14.33773918303389,
-      "within_role_per100": 6.561295064309746
+      "role_per100": 14.337739183033884,
+      "within_role_per100": 6.561295064309751
     },
     {
       "player_name": "Nerlens Noel",
       "n_decisions": 77,
-      "plot_per100": 19.437691348791706,
-      "role_per100": 13.156223750276139,
-      "within_role_per100": 6.281467598515568
+      "plot_per100": 19.4376913487917,
+      "role_per100": 13.156223750276135,
+      "within_role_per100": 6.2814675985155635
     },
     {
       "player_name": "Shabazz Muhammad",
       "n_decisions": 55,
-      "plot_per100": 16.48827281161945,
+      "plot_per100": 16.488272811619446,
       "role_per100": 10.40374482412545,
-      "within_role_per100": 6.084527987493998
+      "within_role_per100": 6.084527987493995
     },
     {
       "player_name": "Jonas Jerebko",
       "n_decisions": 89,
       "plot_per100": 20.008005697860064,
       "role_per100": 13.939409489320646,
-      "within_role_per100": 6.068596208539419
+      "within_role_per100": 6.06859620853942
     },
     {
       "player_name": "Gorgui Dieng",
       "n_decisions": 103,
-      "plot_per100": 17.799488129788347,
-      "role_per100": 12.007695412988422,
-      "within_role_per100": 5.791792716799924
+      "plot_per100": 17.79948812978834,
+      "role_per100": 12.00769541298842,
+      "within_role_per100": 5.791792716799922
     }
   ]
 }
