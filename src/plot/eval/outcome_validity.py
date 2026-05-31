@@ -31,6 +31,8 @@ from __future__ import annotations
 import numpy as np
 import polars as pl
 
+from plot.models.regret.plot_metric import _half_assignment
+
 
 def _qbin(x: np.ndarray, n_bins: int) -> np.ndarray:
     """Quantile-bin (0..n_bins-1); ties collapse so empty bins just don't appear downstream."""
@@ -200,3 +202,189 @@ def outcome_validity_gate(adjusted: dict, cost_by_value: list[dict]) -> dict:
             else "no decision-level outcome cost detected (null / underpowered / selection) — see report"
         ),
     }
+
+
+# ============================== step 2c — player-level cross-fit ==============================
+# The decision-level keystone (step 2) is non-circular by construction: the counterfactual comes from
+# real shooters. The *player-level* read ("does PLOT identify who leaves points?") is the prize, but the
+# in-sample version (correlate a player's model metric with their own S−R shortfall) leaks twice: it
+# reuses the model's S on both sides (mechanical), and measures the metric and the shortfall on the SAME
+# games. This module removes both leaks with a cross-fit: model metric on one half of games, realized
+# points-left on the OTHER half, benchmarked against real takers (empirical R, not the model's S).
+
+_CROSSFIT_METRICS = {"plot_per100": "raw PLOT", "within_role_per100": "within-role residual"}
+
+
+def _matched_taker_cost(
+    looks_half: pl.DataFrame, *, value_col: str, outcome_col: str, declined_col: str,
+    player_col: str, n_bins: int, min_takers_per_bin: int, min_declined: int,
+) -> pl.DataFrame:
+    """Per-player realized points-left on declined open looks, for ONE half of games.
+
+    The counterfactual yardstick is **empirical, not the model**: bin looks by model value ``S`` (a
+    pure matching device), and within each bin take the mean REALIZED possession points of real TAKERS
+    as the benchmark for what a look of that quality yields when taken. A decliner's realized cost is
+    ``benchmark(its S-bin) − R``; averaged per player it is the realized points they left by passing,
+    measured against real shooters — sharing no construction with the model regret metric (only the
+    coarse bin edges come from ``S``). Bins with < ``min_takers_per_bin`` takers form no benchmark and
+    their decliners are dropped; players need ≥ ``min_declined`` scorable declines to enter.
+    """
+    takers = looks_half.filter(pl.col(declined_col) == 0)
+    decliners = looks_half.filter(pl.col(declined_col) == 1)
+    if takers.height < n_bins * min_takers_per_bin or decliners.height == 0:
+        return pl.DataFrame()
+    s_t = takers[value_col].to_numpy().astype(float)
+    r_t = takers[outcome_col].to_numpy().astype(float)
+    edges = np.quantile(s_t, np.linspace(0, 1, n_bins + 1)[1:-1])
+    tb = np.digitize(s_t, edges)
+    bench = {int(bi): float(r_t[tb == bi].mean())
+             for bi in set(tb.tolist()) if int((tb == bi).sum()) >= min_takers_per_bin}
+    if not bench:
+        return pl.DataFrame()
+    db = np.digitize(decliners[value_col].to_numpy().astype(float), edges)
+    benchvals = np.array([bench.get(int(b), np.nan) for b in db])
+    cost = benchvals - decliners[outcome_col].to_numpy().astype(float)
+    return (
+        decliners.with_columns(pl.Series("_cost", cost))
+        .filter(pl.col("_cost").is_not_nan())
+        .group_by(player_col)
+        .agg(pl.len().alias("n_declined_cost"), pl.col("_cost").mean().alias("realized_points_left"))
+        .filter(pl.col("n_declined_cost") >= min_declined)
+    )
+
+
+def _model_metric_half(
+    reg_half: pl.DataFrame, *, player_col: str, min_decisions: int, per: int = 100,
+) -> pl.DataFrame:
+    """Per-player model metric on ONE half of games: raw PLOT and within-role residual per ``per``."""
+    return (
+        reg_half.group_by(player_col)
+        .agg(pl.len().alias("n_decisions_model"),
+             (pl.col("regret_clipped").mean() * per).alias("plot_per100"),
+             (pl.col("regret_clipped_resid").mean() * per).alias("within_role_per100"))
+        .filter(pl.col("n_decisions_model") >= min_decisions)
+    )
+
+
+def _crossfit_corr(j: pl.DataFrame, metric_col: str) -> dict:
+    from scipy import stats  # noqa: PLC0415
+    a = j[metric_col].to_numpy().astype(float)
+    b = j["realized_points_left"].to_numpy().astype(float)
+    pr, pp = stats.pearsonr(a, b)
+    sr, sp = stats.spearmanr(a, b)
+    return {"n_players": int(j.height),
+            "pearson_r": round(float(pr), 4), "pearson_p": round(float(pp), 6),
+            "spearman_r": round(float(sr), 4), "spearman_p": round(float(sp), 6)}
+
+
+def _crossfit_verdict(res: dict) -> dict:
+    """Cross-fit verdict on the WITHIN-ROLE residual (the role-adjusted decision signal): validated if
+    its pooled cross-fit correlation is positive and significant AND both single directions agree in
+    sign. The raw-PLOT pooled result is carried for context."""
+    pooled, da, db = (res.get(k, {}) for k in
+                      ("pooled_crossfit", "direction_modelA_costB", "direction_modelB_costA"))
+
+    def r_of(block, metric):
+        b = block.get(metric) if isinstance(block, dict) else None
+        return b["pearson_r"] if isinstance(b, dict) and "pearson_r" in b else None
+
+    by_metric = {}
+    for metric in _CROSSFIT_METRICS:
+        p = pooled.get(metric) if isinstance(pooled, dict) else None
+        ra, rb = r_of(da, metric), r_of(db, metric)
+        agree = ra is not None and rb is not None and (ra > 0) == (rb > 0)
+        validated = bool(isinstance(p, dict) and p.get("pearson_r", 0.0) > 0
+                         and p.get("pearson_p", 1.0) < 0.05 and agree)
+        by_metric[metric] = {
+            "pooled_pearson_r": p.get("pearson_r") if isinstance(p, dict) else None,
+            "pooled_pearson_p": p.get("pearson_p") if isinstance(p, dict) else None,
+            "directions_agree_sign": agree, "validated": validated,
+        }
+    primary = by_metric.get("within_role_per100", {})
+    return {
+        "by_metric": by_metric,
+        "within_role_validated": primary.get("validated", False),
+        "verdict": (
+            "player-level attribution is non-circular: the within-role metric predicts realized "
+            "points-left out of sample"
+            if primary.get("validated")
+            else "no clean player-level attribution out of sample — the decision-level effect does not "
+                 "cross-fit to individual players (honest null)"
+        ),
+    }
+
+
+def player_cross_fit(
+    looks: pl.DataFrame, residualized_regret: pl.DataFrame, *,
+    value_col: str = "S", outcome_col: str = "R", declined_col: str = "declined",
+    game_col: str = "game_id", player_col: str = "player_id",
+    n_bins: int = 8, min_takers_per_bin: int = 25,
+    min_declined_half: int = 15, min_decisions_half: int = 20, min_players: int = 10,
+) -> dict:
+    """Player-level cross-fit de-circularization of the outcome-validity signal (G6 step 2c).
+
+    The in-sample player-level check (``_player_level`` in the build script) correlates a player's
+    model metric with their realized shortfall ``S − R`` on the SAME games, reusing ``S`` on both
+    sides — exploratory only. This is the rigorous version, breaking both leaks:
+
+    * **out-of-sample across games** — the season's games split odd/even (``_half_assignment``). The
+      MODEL metric (raw PLOT and within-role residual, per 100 decisions) is computed on one half; the
+      REALIZED points-left on the *other* half. No game contributes to both sides of a pair.
+    * **empirical, not model, benchmark** — realized points-left uses the mean realized outcome of
+      real TAKERS in the same look-value bin (``_matched_taker_cost``), not the model's ``S``. The two
+      axes share no construction.
+
+    Both directions are run (model-half-0/cost-half-1 and the swap) and pooled — every pair is
+    cross-fit, each player contributing up to twice (mild within-player dependence; the single-direction
+    blocks have independent player sets and are the conservative read). A POSITIVE, significant
+    correlation ⇒ the players the model flags as leaving points genuinely realize fewer points than
+    matched shooters, out of sample — non-circular player-level outcome validity. A null ⇒ the effect
+    is real at the decision level but does not cleanly attribute to individual players.
+
+    Pure over its two input frames (``looks`` carries ``S``/``R``/``declined``; ``residualized_regret``
+    carries ``regret_clipped`` + ``regret_clipped_resid``); the heavy assembly lives in the build script.
+    """
+    games = sorted(set(looks[game_col].to_list()) | set(residualized_regret[game_col].to_list()))
+    halves = _half_assignment(games)
+    h0 = [g for g, h in halves.items() if h == 0]
+    h1 = [g for g, h in halves.items() if h == 1]
+
+    def direction(model_games, cost_games):
+        model = _model_metric_half(residualized_regret.filter(pl.col(game_col).is_in(model_games)),
+                                   player_col=player_col, min_decisions=min_decisions_half)
+        cost = _matched_taker_cost(
+            looks.filter(pl.col(game_col).is_in(cost_games)),
+            value_col=value_col, outcome_col=outcome_col, declined_col=declined_col,
+            player_col=player_col, n_bins=n_bins, min_takers_per_bin=min_takers_per_bin,
+            min_declined=min_declined_half)
+        if model.height == 0 or cost.height == 0:
+            return pl.DataFrame()
+        return model.join(cost, on=player_col, how="inner")
+
+    j_ab, j_ba = direction(h0, h1), direction(h1, h0)
+    if j_ab.height and j_ba.height:
+        pooled = pl.concat([j_ab, j_ba])
+    else:
+        pooled = j_ab if j_ab.height else j_ba
+
+    def block(j):
+        if j is None or j.height < min_players:
+            return {"n_players": int(0 if j is None else j.height), "note": "too few players"}
+        return {m: _crossfit_corr(j, m) for m in _CROSSFIT_METRICS}
+
+    res = {
+        "n_games": len(games), "n_games_half0": len(h0), "n_games_half1": len(h1),
+        "design": {
+            "model_metric_half": "per-player regret_clipped (raw PLOT) and regret_clipped_resid "
+                                 "(within-role residual), per 100 decisions, on one half of games",
+            "cost_half": "per-player mean (matched-S-bin TAKER realized R − decliner R) on declined "
+                         "open looks on the OTHER half — empirical benchmark, not model S",
+            "n_bins": n_bins, "min_takers_per_bin": min_takers_per_bin,
+            "min_declined_half": min_declined_half, "min_decisions_half": min_decisions_half,
+        },
+        "direction_modelA_costB": block(j_ab),
+        "direction_modelB_costA": block(j_ba),
+        "pooled_crossfit": block(pooled),
+    }
+    res["gate"] = _crossfit_verdict(res)
+    return res

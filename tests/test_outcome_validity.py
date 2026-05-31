@@ -20,6 +20,7 @@ from plot.eval.outcome_validity import (
     adjusted_decline_cost,
     cost_of_declining_by_value,
     outcome_validity_gate,
+    player_cross_fit,
     taker_calibration,
 )
 
@@ -82,3 +83,70 @@ def test_calibration_and_cost_shapes():
     assert len(taker_calibration(df, n_bins=6)) >= 4
     cbv = cost_of_declining_by_value(df, n_bins=5)
     assert all({"n_took", "n_declined", "raw_cost_of_declining"}.issubset(r) for r in cbv)
+
+
+# ----------------------------- step 2c: player-level cross-fit -----------------------------
+# Two synthetic worlds over (model regret frame, open-look frame), keyed by game + player:
+#  * SIGNAL — each player has a latent "points left" skill θ. Their model regret tracks θ; on declined
+#    looks they realize θ fewer points than matched takers (takers realize ≈ S). The cross-fit (model
+#    on one half, realized cost on the other, benchmarked on real takers) must recover a positive,
+#    significant correlation and validate.
+#  * NULL — model regret still tracks θ, but declined looks realize ≈ takers (no points actually left).
+#    The realized-cost axis is noise, so the cross-fit correlation is small and must NOT validate.
+
+_XF_KW = dict(n_bins=4, min_takers_per_bin=10, min_declined_half=10, min_decisions_half=10, min_players=12)
+
+
+def _crossfit_world(seed: int, *, real_cost: bool, n_players: int = 48, n_games: int = 24):
+    rng = np.random.default_rng(seed)
+    theta = rng.uniform(0.0, 0.5, n_players)  # per-player points-left skill
+    games = [f"g{gi:02d}" for gi in range(n_games)]
+
+    reg = {"game_id": [], "player_id": [], "regret_clipped": [], "regret_clipped_resid": []}
+    looks = {"game_id": [], "player_id": [], "declined": [], "S": [], "R": []}
+
+    def add_look(g, p, declined, s, r):
+        looks["game_id"].append(g)
+        looks["player_id"].append(p)
+        looks["declined"].append(declined)
+        looks["S"].append(s)
+        looks["R"].append(r)
+
+    for g in games:
+        for _ in range(110):  # global taker pool, calibrated R ≈ S
+            s = rng.uniform(0.4, 1.6)
+            add_look(g, -1, 0, s, s + rng.normal(0, 0.25))
+        for p in range(n_players):
+            for _ in range(5):  # model regret tracks θ (both raw + residual)
+                val = theta[p] + rng.normal(0, 0.15)
+                reg["game_id"].append(g)
+                reg["player_id"].append(p)
+                reg["regret_clipped"].append(max(0.0, val))
+                reg["regret_clipped_resid"].append(val)
+            for _ in range(4):  # this player's declined looks
+                s = rng.uniform(0.4, 1.6)
+                drop = theta[p] if real_cost else 0.0
+                add_look(g, p, 1, s, s - drop + rng.normal(0, 0.25))
+    return pl.DataFrame(looks), pl.DataFrame(reg)
+
+
+def test_cross_fit_recovers_player_signal():
+    looks, reg = _crossfit_world(0, real_cost=True)
+    res = player_cross_fit(looks, reg, **_XF_KW)
+    pooled = res["pooled_crossfit"]
+    assert pooled["within_role_per100"]["n_players"] >= 12
+    # both axes track θ → strong positive cross-fit correlation that validates
+    assert pooled["within_role_per100"]["pearson_r"] > 0.3
+    assert pooled["within_role_per100"]["pearson_p"] < 0.05
+    assert res["direction_modelA_costB"]["within_role_per100"]["pearson_r"] > 0
+    assert res["direction_modelB_costA"]["within_role_per100"]["pearson_r"] > 0
+    assert res["gate"]["within_role_validated"] is True
+
+
+def test_cross_fit_null_does_not_validate():
+    looks, reg = _crossfit_world(1, real_cost=False)
+    res = player_cross_fit(looks, reg, **_XF_KW)
+    pooled = res["pooled_crossfit"]
+    # realized points-left is noise around 0 → weak correlation, gate must not validate
+    assert abs(pooled["within_role_per100"]["pearson_r"]) < 0.3
+    assert res["gate"]["within_role_validated"] is False

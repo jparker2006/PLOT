@@ -42,6 +42,7 @@ from plot.eval.outcome_validity import (  # noqa: E402
     adjusted_decline_cost,
     cost_of_declining_by_value,
     outcome_validity_gate,
+    player_cross_fit,
     taker_calibration,
 )
 from plot.models.regret.pipeline import (  # noqa: E402
@@ -250,6 +251,25 @@ def main() -> None:
     print(f"  GATE: {ov_gate['gate']} PASS={ov_gate['pass']}")
     print(f"  VERDICT: {ov_gate['verdict']}")
     print(f"  wrote {out}/g6_step2.json")
+
+    # ===== STEP 2c — player-level cross-fit (rigorous, de-circularized version of the player read) =====
+    # model metric on one half of games vs realized points-left on the OTHER half, benchmarked against
+    # real takers' realized R (not model S). Removes both leaks in the exploratory player-level number.
+    xfit = player_cross_fit(looks, res)
+    (out / "g6_step2c.json").write_text(json.dumps(xfit, indent=2))
+    print("=== G6 step 2c — player-level cross-fit (de-circularized) ===")
+    print(f"  games split {xfit['n_games_half0']}/{xfit['n_games_half1']} (model half | cost half)")
+    for d in ("direction_modelA_costB", "direction_modelB_costA", "pooled_crossfit"):
+        blk = xfit[d]
+        if "within_role_per100" in blk:
+            wr, raw = blk["within_role_per100"], blk["plot_per100"]
+            print(f"  {d}: n={wr['n_players']}  within-role r={wr['pearson_r']} (p={wr['pearson_p']})  "
+                  f"raw PLOT r={raw['pearson_r']} (p={raw['pearson_p']})")
+        else:
+            print(f"  {d}: {blk.get('note')} (n={blk.get('n_players')})")
+    print(f"  GATE within_role_validated={xfit['gate']['within_role_validated']}")
+    print(f"  VERDICT: {xfit['gate']['verdict']}")
+    print(f"  wrote {out}/g6_step2c.json")
 
     # ============== STEP 2b — outcome validity for the 2nd decision type ==============
     # shooting over a wide-open teammate vs kicking to him; `declined` ≡ shot over the open man.
