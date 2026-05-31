@@ -117,3 +117,43 @@ one; declining a bad look is free; the effect survives removing turnover-risk, c
 team quality; and it is invisible to the box score.* The exact player-level attribution is where the
 208-game run comes in; the decision-level finding is real and defensible now.
 
+---
+
+## Step 2b — the SECOND decision type does NOT validate (a defining negative; `g6_step2b.json`)
+
+Symmetric test for the other half of the credible set — **shooting over a wide-open teammate**. When a
+handler had a wide-open (≥6 ft), frontcourt, reachable teammate, does *shooting over him* cost points
+vs *kicking* to him? Benchmark `S` = the kick's value (0.80 × best open-teammate xPoints); `declined`
+≡ shot over the open man; same controls (+ the handler's own look) + team FE + game-cluster bootstrap.
+11,572 decisions (2,982 shot over, 8,590 kicked).
+
+**Result — it does not validate, and the opposite is true.**
+
+| readout | value | reading |
+|---|---|---|
+| kick calibration `S` → realized | 0.77→0.98, 1.15→0.99, 1.46→1.00 (**flat ~1.0**) | the teammate-kick value `S` does NOT predict what the kick actually yields |
+| raw cost of shooting over, by `S` | **all negative** (−0.40 … −0.42) | shooting over the open man realizes *more*, not fewer, points |
+| adjusted points lost by shooting over | **−0.35** [−0.44, −0.27] | shooting over is associated with ~0.35 *more* realized points |
+| `declined × S` interaction | +0.09 [−0.04, +0.25] | no dose-response | 
+| shot-ending robustness | −0.31, **survives = False** | — |
+| **gate** | **FAIL** | correctly — no positive cost |
+
+**Why this is one of the most valuable results in the project.**
+* **It explains the v2 failure rigorously.** v2 (score every decision against the full available set)
+  collapsed into a role-of-touch sort because the "pass to the open teammate" counterfactual was
+  unreliable. We diagnosed that by *face validity* before; now **outcome validity confirms it** — the
+  teammate-kick benchmark is flat in `S` (doesn't predict reality). An "open" man is often open
+  *because* he is not a threat, so the kick doesn't deliver its modeled value.
+* **It sharpens the paper's claim to exactly what is true.** PLOT is outcome-valid *only* for the
+  decision whose counterfactual is directly observable — **declining your own open look** (its value
+  is the shooter's own calibrated xPoints). It is *not* valid for the "should've passed to the open
+  man" read. That asymmetry is itself a finding that **contradicts conventional basketball wisdom**.
+* **It refutes "V2 = score more decisions" with data, not opinion.** Breadth doesn't validate; realness
+  comes from **scale + clean foundation + the one validated decision**, not from adding decision types.
+
+**Caveat.** "Kicked to the open man" is identified via the next ball-handler being a wide-open teammate
+(pass recipient from action order); the planned action-layer oreb/shot fix will sharpen this, but is
+unlikely to flip a result this clear. Whether the negative means "the read genuinely isn't a mistake"
+or "the teammate counterfactual is too crude to score" — both lead to the same scope: **score and
+claim only the own-open-look decision.**
+

@@ -16,12 +16,13 @@ from pathlib import Path
 
 import polars as pl
 
+from plot.features.court import HALF_COURT_X
 from plot.models.counterfactual.regret import decision_states, regret_from_states
 from plot.models.counterfactual.regret_full import offensive_options, shot_selection_regret
 from plot.models.counterfactual.xpoints import predict_xpoints, train_xpoints
 from plot.models.eval_bar.seq_dataset import build_game_canonical
 from plot.possessions.actions import extract_actions
-from plot.possessions.shots import OPEN_FT, extract_shots
+from plot.possessions.shots import OPEN_FT, WIDE_OPEN_FT, extract_shots
 
 # the shared per-decision schema both halves emit (post_epv holds the chosen value in either slot)
 V15_COLS = [
@@ -29,6 +30,7 @@ V15_COLS = [
     "sx", "sy", "dist_to_rim", "three_pt", "nearest_def_dist",
     "best_available", "post_epv", "regret_signed", "regret_clipped",
 ]
+_SHOT_ACTIONS = ["shot_make", "shot_miss"]
 MAX_SHOT_FT = 30.0  # beyond this a "declined shot" is a backcourt/bring-up, not a real open look
 
 
@@ -140,6 +142,97 @@ def open_looks_from_intermediates(inter: dict, *, trace: pl.DataFrame) -> pl.Dat
         if not rows:
             continue
         base = pl.concat([r.select(_OPEN_LOOK_COLS) for r in rows])
+        poss = inter["poss"][g].select(
+            "possession_id", pl.col("points").cast(pl.Float64).alias("R"), "period", "end_reason",
+            "offense_team_id")
+        poss_start = inter["actions"][g].group_by("possession_id").agg(
+            pl.col("start_wall_ms").min().alias("poss_start_wall"))
+        tr = trace.filter(pl.col("game_id") == g).select(
+            "possession_id", pl.col("wall_clock_ms").alias("decision_wall_ms"),
+            pl.col("epv").alias("epv_at_decision"))
+        parts.append(
+            base.join(poss, on="possession_id", how="left")
+            .join(poss_start, on="possession_id", how="left")
+            .join(tr, on=["possession_id", "decision_wall_ms"], how="left")
+            .with_columns(((pl.col("decision_wall_ms") - pl.col("poss_start_wall")) / 1000.0)
+                          .clip(0.0, 24.0).alias("poss_elapsed_s"))
+        )
+    return pl.concat(parts)
+
+
+_KICK_COLS = [
+    "game_id", "possession_id", "decision_wall_ms", "player_id", "declined", "S", "own_shot_xp",
+    "dist_to_rim", "three_pt", "nearest_def_dist", "fg_points",
+]
+
+
+def open_kick_decisions_from_intermediates(
+    inter: dict, *, trace: pl.DataFrame, completion: float = 0.80,
+    wide_open_ft: float = WIDE_OPEN_FT, max_pass_ft: float = 28.0,
+) -> pl.DataFrame:
+    """The shot-over-open-man decision frame for G6 step 2b (outcome validity, decision type #2).
+
+    The mirror of the open-look test, with roles swapped. At a ball-handler decision where a
+    WIDE-OPEN (≥ ``wide_open_ft``), frontcourt, reachable (≤ ``max_pass_ft``) teammate exists, the
+    best available option is the **kick** to that teammate (their shot, ``completion``-discounted):
+
+    * **took it** (``declined=0``) — the handler PASSED and the recipient (the next ball-handler) is
+      one of those wide-open teammates;
+    * **declined it** (``declined=1``) — the handler SHOT over the open man.
+
+    ``S`` is the kick's value (``completion`` × best open-teammate xPoints); ``own_shot_xp`` is the
+    handler's own look (a control, since the choice is shoot-own vs kick); ``R`` is realized possession
+    points. Feeds the same ``outcome_validity`` functions as the open-look test (``declined`` ≡ shot
+    over the open man), so the cost of shooting over a *good* kick is estimated the same way."""
+    xmodel = inter["xmodel"]
+    parts = []
+    for g in inter["clean"]:
+        opts = inter["opts"][g]
+        if opts.height == 0:
+            continue
+        _, xp = predict_xpoints(xmodel, opts)
+        opts = opts.with_columns(pl.Series("xpoints", xp))
+        handler = opts.filter(pl.col("is_handler")).select(
+            "possession_id", "action_idx", "action_type", "player_id",
+            pl.col("wall_clock_ms").alias("decision_wall_ms"), pl.col("xpoints").alias("own_shot_xp"),
+            "dist_to_rim", pl.col("three_pt").cast(pl.Int64).alias("three_pt"), "nearest_def_dist",
+            pl.col("x_canon").alias("hx"), pl.col("y_canon").alias("hy"))
+        if handler.height == 0:
+            continue
+        tm = (
+            opts.filter((~pl.col("is_handler")) & (pl.col("nearest_def_dist") >= wide_open_ft)
+                        & (pl.col("x_canon") >= HALF_COURT_X))
+            .join(handler.select("possession_id", "action_idx", "hx", "hy"),
+                  on=["possession_id", "action_idx"], how="inner")
+            .with_columns((((pl.col("x_canon") - pl.col("hx")) ** 2
+                            + (pl.col("y_canon") - pl.col("hy")) ** 2).sqrt()).alias("_pd"))
+            .filter(pl.col("_pd") <= max_pass_ft)
+        )
+        if tm.height == 0:
+            continue
+        best_tm = tm.group_by("possession_id", "action_idx").agg(
+            pl.col("xpoints").max().alias("best_tm_xp"), pl.col("player_id").alias("open_ids"))
+        # recipient of a pass = the actor of the NEXT action in the possession
+        acts = inter["actions"][g].select("possession_id", "action_idx", "actor_player_id")
+        recip = acts.with_columns((pl.col("action_idx") - 1).alias("_k")).select(
+            "possession_id", pl.col("_k").alias("action_idx"), pl.col("actor_player_id").alias("recipient"))
+        h = (
+            handler.join(best_tm, on=["possession_id", "action_idx"], how="inner")
+            .join(recip, on=["possession_id", "action_idx"], how="left")
+            .with_columns(
+                pl.col("action_type").is_in(_SHOT_ACTIONS).alias("_is_shot"),
+                ((pl.col("action_type") == "pass")
+                 & pl.col("recipient").is_in(pl.col("open_ids"))).alias("_kicked"),
+                (completion * pl.col("best_tm_xp")).alias("S"),
+            )
+            .filter(pl.col("_is_shot") | pl.col("_kicked"))  # shot-over-open-man, or kicked to him
+            .with_columns(pl.when(pl.col("_is_shot")).then(1).otherwise(0).cast(pl.Int64).alias("declined"),
+                          pl.lit(g).alias("game_id"),
+                          pl.lit(None, dtype=pl.Float64).alias("fg_points"))
+        )
+        if h.height == 0:
+            continue
+        base = h.select(_KICK_COLS)
         poss = inter["poss"][g].select(
             "possession_id", pl.col("points").cast(pl.Float64).alias("R"), "period", "end_reason",
             "offense_team_id")

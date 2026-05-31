@@ -1,0 +1,168 @@
+{
+  "corpus": {
+    "clean_games": 42,
+    "decisions": 11572,
+    "n_shot_over": 2982,
+    "n_kicked": 8590
+  },
+  "design": {
+    "universe": "ball-handler with a wide-open (>=6ft), frontcourt, reachable (<=28ft) teammate; declined=shot over him, took=kicked to him",
+    "benchmark": "S = 0.80 * best open-teammate xPoints (completion-discounted)",
+    "controls": [
+      "epv_at_decision",
+      "dist_to_rim",
+      "three_pt",
+      "nearest_def_dist",
+      "poss_elapsed_s",
+      "period",
+      "own_shot_xp"
+    ],
+    "team_fe": true,
+    "inference": "game-cluster bootstrap"
+  },
+  "taker_calibration_kick": [
+    {
+      "s_bin": 0,
+      "n": 1432,
+      "mean_value": 0.7739,
+      "mean_realized": 0.9811
+    },
+    {
+      "s_bin": 1,
+      "n": 1431,
+      "mean_value": 0.9248,
+      "mean_realized": 1.0496
+    },
+    {
+      "s_bin": 2,
+      "n": 1432,
+      "mean_value": 1.0241,
+      "mean_realized": 1.0622
+    },
+    {
+      "s_bin": 3,
+      "n": 1431,
+      "mean_value": 1.15,
+      "mean_realized": 0.9909
+    },
+    {
+      "s_bin": 4,
+      "n": 1432,
+      "mean_value": 1.313,
+      "mean_realized": 0.9344
+    },
+    {
+      "s_bin": 5,
+      "n": 1432,
+      "mean_value": 1.4557,
+      "mean_realized": 0.9993
+    }
+  ],
+  "cost_of_shooting_over_by_kick_value": [
+    {
+      "s_bin": 0,
+      "mean_value": 0.8012,
+      "n_took": 1861,
+      "n_declined": 454,
+      "mean_realized_took": 0.9962,
+      "mean_realized_declined": 1.3943,
+      "raw_cost_of_declining": -0.398
+    },
+    {
+      "s_bin": 1,
+      "mean_value": 0.971,
+      "n_took": 1851,
+      "n_declined": 463,
+      "mean_realized_took": 1.0497,
+      "mean_realized_declined": 1.3844,
+      "raw_cost_of_declining": -0.3347
+    },
+    {
+      "s_bin": 2,
+      "mean_value": 1.1091,
+      "n_took": 1800,
+      "n_declined": 514,
+      "mean_realized_took": 1.0283,
+      "mean_realized_declined": 1.3132,
+      "raw_cost_of_declining": -0.2849
+    },
+    {
+      "s_bin": 3,
+      "mean_value": 1.3015,
+      "n_took": 1630,
+      "n_declined": 684,
+      "mean_realized_took": 0.9393,
+      "mean_realized_declined": 1.3246,
+      "raw_cost_of_declining": -0.3853
+    },
+    {
+      "s_bin": 4,
+      "mean_value": 1.4536,
+      "n_took": 1448,
+      "n_declined": 867,
+      "mean_realized_took": 0.9917,
+      "mean_realized_declined": 1.4152,
+      "raw_cost_of_declining": -0.4235
+    }
+  ],
+  "adjusted_cost": {
+    "n_decisions": 11572,
+    "n_games": 42,
+    "n_took": 8590,
+    "n_declined": 2982,
+    "s_mean": 1.1273,
+    "s_high_quantile": 0.9,
+    "s_high": 1.4495,
+    "points_lost_by_declining_at_meanS": -0.3465,
+    "ci_meanS": [
+      -0.4416,
+      -0.2658
+    ],
+    "p_meanS": 0.0,
+    "points_lost_by_declining_at_highS": -0.3757,
+    "ci_highS": [
+      -0.4944,
+      -0.2851
+    ],
+    "p_highS": 0.0,
+    "interaction_declinedxS": 0.0906,
+    "ci_interaction": [
+      -0.0436,
+      0.2515
+    ],
+    "p_interaction": 0.196,
+    "controls": [
+      "epv_at_decision",
+      "dist_to_rim",
+      "three_pt",
+      "nearest_def_dist",
+      "poss_elapsed_s",
+      "period",
+      "own_shot_xp"
+    ],
+    "team_fe": true,
+    "n_boot": 500
+  },
+  "robustness_shot_ending": {
+    "points_lost_at_highS": -0.3145,
+    "ci_highS": [
+      -0.4413,
+      -0.2126
+    ],
+    "survives": false
+  },
+  "gate": {
+    "gate": {
+      "high_value_decline_costs_points": false,
+      "cost_grows_with_value": false
+    },
+    "pass": false,
+    "headline_points_lost_high_value": -0.3757,
+    "headline_ci": [
+      -0.4944,
+      -0.2851
+    ],
+    "verdict": "no decision-level outcome cost detected (null / underpowered / selection) \u2014 see report"
+  },
+  "caveat": "'kicked to the open man' is identified via the next ball-handler being a wide-open teammate (pass recipient from action order); the action-layer oreb/shot fix (V2 foundation) will sharpen this. Selection-on-unobservables bounded, not eliminated."
+}

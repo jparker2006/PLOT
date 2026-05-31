@@ -46,6 +46,7 @@ from plot.eval.outcome_validity import (  # noqa: E402
 )
 from plot.models.regret.pipeline import (  # noqa: E402
     load_game_intermediates,
+    open_kick_decisions_from_intermediates,
     open_looks_from_intermediates,
     regret_from_intermediates,
 )
@@ -53,6 +54,7 @@ from plot.models.regret.plot_metric import split_half_stability  # noqa: E402
 
 OPEN_LOOK_CONTROLS = ["epv_at_decision", "dist_to_rim", "three_pt", "nearest_def_dist",
                       "poss_elapsed_s", "period"]
+KICK_CONTROLS = OPEN_LOOK_CONTROLS + ["own_shot_xp"]  # + the handler's own look (shoot-own vs kick)
 
 MIN_DECISIONS = 30
 MIN_PER_HALF = 15
@@ -224,6 +226,57 @@ def main() -> None:
     print(f"  GATE: {ov_gate['gate']} PASS={ov_gate['pass']}")
     print(f"  VERDICT: {ov_gate['verdict']}")
     print(f"  wrote {out}/g6_step2.json")
+
+    # ============== STEP 2b — outcome validity for the 2nd decision type ==============
+    # shooting over a wide-open teammate vs kicking to him; `declined` ≡ shot over the open man.
+    kick = open_kick_decisions_from_intermediates(inter, trace=trace).drop_nulls(
+        ["R", "epv_at_decision", "S", "poss_elapsed_s", "own_shot_xp"])
+    n_over = int((kick["declined"] == 1).sum())
+    n_kick = int((kick["declined"] == 0).sum())
+    print(f"\nshot-over-open-man decisions: {kick.height} (shot over {n_over}, kicked {n_kick})")
+    calib_kick = taker_calibration(kick, n_bins=6)
+    cbv_kick = cost_of_declining_by_value(kick, n_bins=5)
+    adj_kick = adjusted_decline_cost(kick, controls=KICK_CONTROLS, n_boot=500, seed=0)
+    kick_shotend = kick.filter(pl.col("end_reason").is_in(["made_fg", "defensive_rebound"]))
+    adj_kick_se = adjusted_decline_cost(kick_shotend, controls=KICK_CONTROLS, n_boot=500, seed=0)
+    gate_kick = outcome_validity_gate(adj_kick, cbv_kick)
+
+    report2b = {
+        "corpus": {"clean_games": len(clean), "decisions": kick.height,
+                   "n_shot_over": n_over, "n_kicked": n_kick},
+        "design": {"universe": "ball-handler with a wide-open (>=6ft), frontcourt, reachable (<=28ft) "
+                               "teammate; declined=shot over him, took=kicked to him",
+                   "benchmark": "S = 0.80 * best open-teammate xPoints (completion-discounted)",
+                   "controls": KICK_CONTROLS, "team_fe": True, "inference": "game-cluster bootstrap"},
+        "taker_calibration_kick": calib_kick,
+        "cost_of_shooting_over_by_kick_value": cbv_kick,
+        "adjusted_cost": adj_kick,
+        "robustness_shot_ending": {
+            "points_lost_at_highS": adj_kick_se["points_lost_by_declining_at_highS"],
+            "ci_highS": adj_kick_se["ci_highS"],
+            "survives": bool(adj_kick_se["points_lost_by_declining_at_highS"] > 0
+                             and adj_kick_se["ci_highS"][0] > 0)},
+        "gate": gate_kick,
+        "caveat": "'kicked to the open man' is identified via the next ball-handler being a wide-open "
+                  "teammate (pass recipient from action order); the action-layer oreb/shot fix (V2 "
+                  "foundation) will sharpen this. Selection-on-unobservables bounded, not eliminated.",
+    }
+    (out / "g6_step2b.json").write_text(json.dumps(report2b, indent=2))
+    print("=== G6 step 2b — shot-over-open-man outcome validity ===")
+    print("  kick calibration S→realized: "
+          + ", ".join(f"{c['mean_value']:.2f}->{c['mean_realized']:.2f}" for c in calib_kick))
+    print("  raw cost of shooting-over by kick value: "
+          + ", ".join(f"{r['mean_value']:.2f}:{r['raw_cost_of_declining']:+.3f}" for r in cbv_kick))
+    print(f"  ADJUSTED points lost by shooting over — meanS {adj_kick['points_lost_by_declining_at_meanS']} "
+          f"CI{adj_kick['ci_meanS']} | highS({adj_kick['s_high']}) "
+          f"{adj_kick['points_lost_by_declining_at_highS']} CI{adj_kick['ci_highS']}")
+    print(f"  interaction declined×S {adj_kick['interaction_declinedxS']} CI{adj_kick['ci_interaction']}")
+    print(f"  shot-ending robustness: {report2b['robustness_shot_ending']['points_lost_at_highS']} "
+          f"CI{report2b['robustness_shot_ending']['ci_highS']} "
+          f"survives={report2b['robustness_shot_ending']['survives']}")
+    print(f"  GATE: {gate_kick['gate']} PASS={gate_kick['pass']}")
+    print(f"  VERDICT: {gate_kick['verdict']}")
+    print(f"  wrote {out}/g6_step2b.json")
 
 
 def _player_level(looks: pl.DataFrame, named: pl.DataFrame) -> dict:
