@@ -1,0 +1,303 @@
+{
+  "corpus": {
+    "clean_games": 207,
+    "decisions": 152396,
+    "n_players_in_metric": 386
+  },
+  "context_features": [
+    "sx",
+    "sy",
+    "dist_to_rim",
+    "three_pt",
+    "nearest_def_dist",
+    "decision_kind"
+  ],
+  "variance_decomposition_clipped": {
+    "n_players": 386,
+    "value_col": "regret_clipped",
+    "var_player_mean_raw": 0.002892,
+    "var_role_component": 0.000857,
+    "var_within_role_component": 0.001513,
+    "cov_role_within": 0.000261,
+    "role_share": 0.2964,
+    "within_role_share": 0.5229,
+    "cross_share": 0.1807,
+    "r2_role_reconstructs_leaderboard": 0.5046
+  },
+  "variance_decomposition_signed": {
+    "n_players": 386,
+    "value_col": "regret_signed",
+    "var_player_mean_raw": 0.006776,
+    "var_role_component": 0.001996,
+    "var_within_role_component": 0.003673,
+    "cov_role_within": 0.000554,
+    "role_share": 0.2945,
+    "within_role_share": 0.542,
+    "cross_share": 0.1634,
+    "r2_role_reconstructs_leaderboard": 0.4806
+  },
+  "reliability_raw_clipped": {
+    "n_players": 356,
+    "value_col": "regret_clipped",
+    "min_decisions_per_half": 15,
+    "pearson_r": 0.48,
+    "pearson_p": 0.0,
+    "spearman_r": 0.5021,
+    "spearman_p": 0.0,
+    "spearman_brown_full": 0.6486
+  },
+  "reliability_within_role_clipped": {
+    "n_players": 356,
+    "value_col": "regret_clipped_resid",
+    "min_decisions_per_half": 15,
+    "pearson_r": 0.3093,
+    "pearson_p": 0.0,
+    "spearman_r": 0.3216,
+    "spearman_p": 0.0,
+    "spearman_brown_full": 0.4725
+  },
+  "context_capacity_sensitivity": {
+    "weak": {
+      "role_share": 0.1507,
+      "within_role_share": 0.6093,
+      "resid_reliability_sb": 0.5385,
+      "resid_reliability_p": 0.0
+    },
+    "default": {
+      "role_share": 0.2964,
+      "within_role_share": 0.5229,
+      "resid_reliability_sb": 0.4725,
+      "resid_reliability_p": 0.0
+    },
+    "strong": {
+      "role_share": 0.329,
+      "within_role_share": 0.501,
+      "resid_reliability_sb": 0.4625,
+      "resid_reliability_p": 0.0
+    }
+  },
+  "gate": {
+    "gate": {
+      "role_dominated": false,
+      "within_role_reliable": true
+    },
+    "role_share": 0.2964,
+    "reliability_raw_sb": 0.6486,
+    "reliability_within_role_sb": 0.4725,
+    "verdict": "within-role decision quality is a reliable, validate-able signal"
+  },
+  "leaderboard_top15_by_raw_plot": [
+    {
+      "player_name": "Miles Plumlee",
+      "n_decisions": 70,
+      "plot_per100": 37.42778006363465,
+      "role_per100": 26.861939161280485,
+      "within_role_per100": 10.56584090235416
+    },
+    {
+      "player_name": "Willie Reed",
+      "n_decisions": 38,
+      "plot_per100": 35.03863343290776,
+      "role_per100": 18.00027219132826,
+      "within_role_per100": 17.038361241579494
+    },
+    {
+      "player_name": "Brandan Wright",
+      "n_decisions": 32,
+      "plot_per100": 34.77743694596539,
+      "role_per100": 17.034176915313846,
+      "within_role_per100": 17.743260030651538
+    },
+    {
+      "player_name": "Caron Butler",
+      "n_decisions": 51,
+      "plot_per100": 32.34845036187116,
+      "role_per100": 18.401679936301385,
+      "within_role_per100": 13.946770425569774
+    },
+    {
+      "player_name": "Montrezl Harrell",
+      "n_decisions": 60,
+      "plot_per100": 32.244657737743836,
+      "role_per100": 19.734055217310587,
+      "within_role_per100": 12.510602520433247
+    },
+    {
+      "player_name": "Kosta Koufos",
+      "n_decisions": 344,
+      "plot_per100": 31.222502720881344,
+      "role_per100": 21.517334727911138,
+      "within_role_per100": 9.705167992970205
+    },
+    {
+      "player_name": "Luc Mbah a Moute",
+      "n_decisions": 128,
+      "plot_per100": 29.63563388622138,
+      "role_per100": 18.823678508792778,
+      "within_role_per100": 10.811955377428605
+    },
+    {
+      "player_name": "Willie Cauley-Stein",
+      "n_decisions": 186,
+      "plot_per100": 28.850671801957876,
+      "role_per100": 21.839497822433415,
+      "within_role_per100": 7.011173979524464
+    },
+    {
+      "player_name": "Hassan Whiteside",
+      "n_decisions": 426,
+      "plot_per100": 26.937658459213047,
+      "role_per100": 20.487059576863015,
+      "within_role_per100": 6.450598882350037
+    },
+    {
+      "player_name": "Justin Holiday",
+      "n_decisions": 48,
+      "plot_per100": 26.85287234208816,
+      "role_per100": 16.38415140236956,
+      "within_role_per100": 10.4687209397186
+    },
+    {
+      "player_name": "203461",
+      "n_decisions": 38,
+      "plot_per100": 26.113151963110663,
+      "role_per100": 17.477735674310505,
+      "within_role_per100": 8.63541628880016
+    },
+    {
+      "player_name": "Joffrey Lauvergne",
+      "n_decisions": 211,
+      "plot_per100": 26.07827387294708,
+      "role_per100": 18.262902322082347,
+      "within_role_per100": 7.815371550864731
+    },
+    {
+      "player_name": "Tiago Splitter",
+      "n_decisions": 235,
+      "plot_per100": 26.04460856767724,
+      "role_per100": 19.41249408320228,
+      "within_role_per100": 6.632114484474963
+    },
+    {
+      "player_name": "Adreian Payne",
+      "n_decisions": 120,
+      "plot_per100": 25.578470505588687,
+      "role_per100": 18.103297999786797,
+      "within_role_per100": 7.4751725058018845
+    },
+    {
+      "player_name": "Aron Baynes",
+      "n_decisions": 342,
+      "plot_per100": 25.33747173726869,
+      "role_per100": 19.097815857994647,
+      "within_role_per100": 6.239655879274046
+    }
+  ],
+  "leaderboard_top15_by_within_role": [
+    {
+      "player_name": "Brandan Wright",
+      "n_decisions": 32,
+      "plot_per100": 34.77743694596539,
+      "role_per100": 17.034176915313846,
+      "within_role_per100": 17.743260030651538
+    },
+    {
+      "player_name": "Willie Reed",
+      "n_decisions": 38,
+      "plot_per100": 35.03863343290776,
+      "role_per100": 18.00027219132826,
+      "within_role_per100": 17.038361241579494
+    },
+    {
+      "player_name": "Caron Butler",
+      "n_decisions": 51,
+      "plot_per100": 32.34845036187116,
+      "role_per100": 18.401679936301385,
+      "within_role_per100": 13.946770425569774
+    },
+    {
+      "player_name": "Montrezl Harrell",
+      "n_decisions": 60,
+      "plot_per100": 32.244657737743836,
+      "role_per100": 19.734055217310587,
+      "within_role_per100": 12.510602520433247
+    },
+    {
+      "player_name": "Luc Mbah a Moute",
+      "n_decisions": 128,
+      "plot_per100": 29.63563388622138,
+      "role_per100": 18.823678508792778,
+      "within_role_per100": 10.811955377428605
+    },
+    {
+      "player_name": "Miles Plumlee",
+      "n_decisions": 70,
+      "plot_per100": 37.42778006363465,
+      "role_per100": 26.861939161280485,
+      "within_role_per100": 10.56584090235416
+    },
+    {
+      "player_name": "Justin Holiday",
+      "n_decisions": 48,
+      "plot_per100": 26.85287234208816,
+      "role_per100": 16.38415140236956,
+      "within_role_per100": 10.4687209397186
+    },
+    {
+      "player_name": "Kosta Koufos",
+      "n_decisions": 344,
+      "plot_per100": 31.222502720881344,
+      "role_per100": 21.517334727911138,
+      "within_role_per100": 9.705167992970205
+    },
+    {
+      "player_name": "Kostas Papanikolaou",
+      "n_decisions": 104,
+      "plot_per100": 23.402759920359344,
+      "role_per100": 14.145863587473242,
+      "within_role_per100": 9.256896332886098
+    },
+    {
+      "player_name": "Mario Hezonja",
+      "n_decisions": 69,
+      "plot_per100": 21.44227392587435,
+      "role_per100": 12.745648854143193,
+      "within_role_per100": 8.696625071731159
+    },
+    {
+      "player_name": "203461",
+      "n_decisions": 38,
+      "plot_per100": 26.113151963110663,
+      "role_per100": 17.477735674310505,
+      "within_role_per100": 8.63541628880016
+    },
+    {
+      "player_name": "Solomon Hill",
+      "n_decisions": 57,
+      "plot_per100": 24.255986799948044,
+      "role_per100": 16.102087514358928,
+      "within_role_per100": 8.153899285589116
+    },
+    {
+      "player_name": "Matt Bonner",
+      "n_decisions": 50,
+      "plot_per100": 24.37257983974404,
+      "role_per100": 16.36144915323213,
+      "within_role_per100": 8.011130686511914
+    },
+    {
+      "player_name": "Joffrey Lauvergne",
+      "n_decisions": 211,
+      "plot_per100": 26.07827387294708,
+      "role_per100": 18.262902322082347,
+      "within_role_per100": 7.815371550864731
+    },
+    {
+      "player_name": "Adreian Payne",
+      "n_decisions": 120,
+      "plot_per100": 25.578470505588687,
+      "role_per100": 18.103297999786797,
+      "within_role_per100": 7.4751725058018845
+    }
+  ]
+}

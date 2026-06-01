@@ -1,0 +1,79 @@
+{
+  "n_games": 207,
+  "n_games_half0": 104,
+  "n_games_half1": 103,
+  "design": {
+    "model_metric_half": "per-player regret_clipped (raw PLOT) and regret_clipped_resid (within-role residual), per 100 decisions, on one half of games",
+    "cost_half": "per-player mean (matched-S-bin TAKER realized R \u2212 decliner R) on declined open looks on the OTHER half \u2014 empirical benchmark, not model S",
+    "n_bins": 8,
+    "min_takers_per_bin": 25,
+    "min_declined_half": 15,
+    "min_decisions_half": 20
+  },
+  "direction_modelA_costB": {
+    "plot_per100": {
+      "n_players": 330,
+      "pearson_r": 0.0554,
+      "pearson_p": 0.315619,
+      "spearman_r": 0.0596,
+      "spearman_p": 0.280739
+    },
+    "within_role_per100": {
+      "n_players": 330,
+      "pearson_r": 0.0535,
+      "pearson_p": 0.332742,
+      "spearman_r": 0.049,
+      "spearman_p": 0.37486
+    }
+  },
+  "direction_modelB_costA": {
+    "plot_per100": {
+      "n_players": 329,
+      "pearson_r": 0.1529,
+      "pearson_p": 0.005435,
+      "spearman_r": 0.1738,
+      "spearman_p": 0.001551
+    },
+    "within_role_per100": {
+      "n_players": 329,
+      "pearson_r": 0.1907,
+      "pearson_p": 0.000504,
+      "spearman_r": 0.2044,
+      "spearman_p": 0.000189
+    }
+  },
+  "pooled_crossfit": {
+    "plot_per100": {
+      "n_players": 659,
+      "pearson_r": 0.1023,
+      "pearson_p": 0.008573,
+      "spearman_r": 0.1161,
+      "spearman_p": 0.002843
+    },
+    "within_role_per100": {
+      "n_players": 659,
+      "pearson_r": 0.1135,
+      "pearson_p": 0.003535,
+      "spearman_r": 0.1212,
+      "spearman_p": 0.001821
+    }
+  },
+  "gate": {
+    "by_metric": {
+      "plot_per100": {
+        "pooled_pearson_r": 0.1023,
+        "pooled_pearson_p": 0.008573,
+        "directions_agree_sign": true,
+        "validated": true
+      },
+      "within_role_per100": {
+        "pooled_pearson_r": 0.1135,
+        "pooled_pearson_p": 0.003535,
+        "directions_agree_sign": true,
+        "validated": true
+      }
+    },
+    "within_role_validated": true,
+    "verdict": "player-level attribution is non-circular: the within-role metric predicts realized points-left out of sample"
+  }
+}
