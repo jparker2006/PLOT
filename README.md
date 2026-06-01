@@ -13,12 +13,15 @@ This repository contains three deliverables built on one spine:
    (a "VAEP-for-basketball"), from public player + ball tracking.
 2. **PLOT metric** — decision regret, valued against the distribution of genuinely-available
    alternatives, aggregated to a per-player *points left on the table*.
-3. **Live demo** — an animated, chess.com-style possession review (Next.js).
+3. **Live demo** — an animated, chess.com-style possession review (Next.js), **live at
+   <https://plot-nba.vercel.app>**.
 
-An accompanying arXiv preprint documents the value layer + PLOT with calibration, validation,
-and honest limitations.
+A drafted arXiv preprint ([`paper/`](paper/)) documents the value layer + PLOT with calibration, the
+outcome-validity tests, and honest limitations.
 
-> **Status:** early. Built on the only frozen public tracking season (2015-16 SportVU).
+> **Status:** the gated program **G1–G6 is complete** — including outcome validity against *real*
+> possession outcomes (G6). Built on the only frozen public tracking season (2015-16 SportVU); the
+> outcome-validated claim is deliberately narrow and modest in magnitude (see G6).
 
 ## Proof of life (Stage 1)
 
@@ -153,15 +156,56 @@ decision quality (that needs the missing counterfactual). Report: [`reports/G5/`
 uv run --extra seq python scripts/build_g5.py                  # validity checks + G5 -> reports/G5/
 ```
 
-## Live demo (Stage 7)
+## Outcome validity + what it measures — Gate G6 (the keystone)
 
-A **chess.com-style possession review** in Next.js: an animated court, the **eval bar** (per-frame
-EPV) rising and falling, and **decision badges** on each open ball-handler pass-up — great / good /
-inaccuracy / mistake / blunder, tiered on *points left on the table*. Everything is precomputed
-static JSON; **no model runs in the browser**. See [`web/`](web/README.md).
+G1–G5 prove PLOT is calibrated, stable, distinct, and valid *conditional on observables* — but all of
+that is the model judged against itself. **G6 is the first test against reality**, and it answers the two
+questions that decide whether the metric is *actually useful*. On the 208-game corpus:
+
+- **Within-role decision quality, not just role-of-touch.** Residualizing per-decision regret on
+  touch-context (location, openness, rim distance, decision kind), out-of-fold by game, splits the
+  between-player signal: within-role decision quality is the **majority (52%)**, role-of-touch the
+  minority (**29%**), and the within-role residual is itself reliable (Spearman–Brown **0.54**) and robust
+  to the strength of the role control (not leakage). The leaderboard is mostly real, role-adjusted
+  decision-making — not just position.
+- **The keystone — declining your own open look costs real points.** The cleanest decision (an open
+  ball-handler who *takes* vs *declines* the shot) has a *directly observable* counterfactual: real
+  shooters at matched looks. Net of observables, shot-clock, and team fixed effects, **declining an open
+  look costs ≈0.11 points on an average look, ≈0.19 on a great one**; declining a *bad* look is free; the
+  cost grows with look value; and it survives removing turnover exposure and action-layer mis-typing. The
+  natural selection objection cuts the *wrong* way — decliners realize *fewer* points, not more. This is
+  the one result that touches reality, and it **passes**.
+- **The open-man myth (a defining negative).** The mirror test — *shooting over a wide-open teammate* —
+  does **not** validate: the teammate-kick counterfactual is flat in its modeled value, and shooting over
+  realizes *more* points, not fewer. An "open man" is often open *because* he is not a threat. So PLOT is
+  outcome-valid for the decision whose counterfactual is observable (your own open look), **not** for the
+  conventional "pass to the open man" read.
+- **Player-level attribution is weak.** A de-circularized cross-fit (model metric on one half of games,
+  realized points-left on the other, benchmarked against real takers — not the model) finds only **weak,
+  fragile** support that the metric ranks *which* players leave points: pooled within-role r ≈ **0.11**,
+  one of two folds individually null, heavily attenuated from an in-sample 0.33. The robust claim stays at
+  the *decision* level.
+
+**Verdict.** Players systematically leave real points by declining good open looks — measurable,
+reliable, box-invisible, and outcome-validated to cost points — while the intuitive "pass to the open
+man" does not survive the same test. Modest magnitude, narrow scope, honest about
+selection-on-unobservables. Report: [`reports/G6/`](reports/G6/README.md).
 
 ```bash
-uv run --extra seq python scripts/export_demo_json.py --games 0021500308 0021500203  # -> web/public/demo/
+uv run --extra seq python scripts/build_g6.py                 # decomposition + outcome validity -> reports/G6/
+```
+
+## Live demo (Stage 7)
+
+**Live: <https://plot-nba.vercel.app>** — a **chess.com-style possession review** in Next.js: an animated
+court (team colors, player initials, ball trail), the **eval bar** (per-frame EPV) rising and falling,
+clickable **decision badges** on each open ball-handler pass-up — great / good / inaccuracy / mistake /
+blunder, tiered on *points left on the table* — and a "biggest misses" highlight reel. Six marquee games;
+everything is precomputed static JSON, **no model runs in the browser**. See [`web/`](web/README.md).
+
+```bash
+uv run --extra seq python scripts/export_demo_json.py \
+  --games 0021500336 0021500214 0021500013 0021500367 0021500308 0021500203  # -> web/public/demo/
 cd web && npm install && npm run dev                           # http://localhost:3000
 ```
 
@@ -194,10 +238,10 @@ src/plot/
     regret/          # the PLOT metric
   viz/            # matplotlib prototype animation
   eval/           # calibration, reliability, gate tests
-scripts/          # data download, possession build, demo export
-notebooks/        # one validation report per gate (G1–G4)
-web/              # Next.js demo app
-paper/            # arXiv write-up + figures
+scripts/          # data download, possession build, gate builds (build_g3..g6), demo export
+reports/          # one machine-readable report (JSON + figures) per gate (G1–G6)
+web/              # Next.js demo app (deployed to Vercel)
+paper/            # arXiv write-up (LaTeX) + figures
 tests/            # pytest
 ```
 
