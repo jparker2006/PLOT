@@ -95,8 +95,27 @@ export default function Demo() {
   const activeDec = activeIdx >= 0 ? poss.decisions[activeIdx] : null;
   const highlight = activeDec ? activeDec.player : null;
 
+  const possPointsLeft = useMemo(
+    () => (poss?.decisions || []).reduce((s, d) => s + Math.max(0, d.regret_clipped), 0),
+    [poss]
+  );
+  // game-level highlight reel: the most-regretful decisions across all featured possessions
+  const topMoments = useMemo(() => {
+    if (!data?.possessions) return [];
+    const all = [];
+    data.possessions.forEach((p, pi) =>
+      (p.decisions || []).forEach((d) => { if (d.regret_clipped > 0) all.push({ pi, ...d }); })
+    );
+    return all.sort((a, b) => b.regret_clipped - a.regret_clipped).slice(0, 6);
+  }, [data]);
+
   const pick = useCallback((frameIdx) => {
     setPlaying(false);
+    setT(frameIdx / FPS);
+  }, []);
+  const jumpTo = useCallback((pi, frameIdx) => {
+    setPlaying(false);
+    setPossIdx(pi);
     setT(frameIdx / FPS);
   }, []);
 
@@ -133,13 +152,24 @@ export default function Demo() {
         <div className="courtcard">
           <div className="courtrow">
             <EvalBar epv={frame?.epv} />
-            <Court frame={frame} teams={data.teams} highlight={highlight} />
+            <Court frame={frame} teams={data.teams} highlight={highlight}
+                   players={data.players} teamAbbr={data.team_abbr} />
           </div>
           <div className="scrub">
-            <input
-              type="range" min={0} max={duration} step={0.05} value={t}
-              onChange={(e) => { setPlaying(false); setT(+e.target.value); }}
-            />
+            <div className="scrubwrap">
+              <input
+                type="range" min={0} max={duration || 0} step={0.05} value={t}
+                onChange={(e) => { setPlaying(false); setT(+e.target.value); }}
+              />
+              {duration > 0 && (poss?.decisions || []).map((d, i) => (
+                <button
+                  key={i} className={`tickmark ${d.badge}`}
+                  style={{ left: `${Math.max(0, Math.min(100, (d.frame / FPS / duration) * 100))}%` }}
+                  title={`${BADGE_LABEL[d.badge]} — ${data.players?.[String(d.player)]?.name || "?"}`}
+                  onClick={() => pick(d.frame)}
+                />
+              ))}
+            </div>
             <div className="clock">
               <span>game clock {frame?.gc != null ? frame.gc.toFixed(1) : "—"}s</span>
               <span>{t.toFixed(1)} / {duration.toFixed(1)}s</span>
@@ -148,22 +178,59 @@ export default function Demo() {
           <div className={`callout${activeDec ? "" : " empty"}`}>
             {activeDec ? (
               <>
-                <span className={`badge ${activeDec.badge}`}>{BADGE_LABEL[activeDec.badge]}</span>{" "}
-                <b>{data.players?.[String(activeDec.player)]?.name || "?"}</b> {BADGE_BLURB[activeDec.badge]} —
-                open shot worth <b>{activeDec.best_available.toFixed(2)}</b>, the pass led to{" "}
-                <b>{activeDec.post_epv.toFixed(2)}</b>
-                {activeDec.regret_clipped > 0 ? <> (<b>{activeDec.regret_clipped.toFixed(2)}</b> left on the table).</> : <> — a good read.</>}
+                <div className="cline">
+                  <span className={`badge ${activeDec.badge}`}>{BADGE_LABEL[activeDec.badge]}</span>{" "}
+                  <b>{data.players?.[String(activeDec.player)]?.name || "?"}</b> {BADGE_BLURB[activeDec.badge]}.
+                </div>
+                {(() => {
+                  const lo = Math.max(activeDec.best_available, activeDec.post_epv, 0.1);
+                  const w = (v) => `${Math.max(3, (v / lo) * 100)}%`;
+                  return (
+                    <div className="cmp">
+                      <div className="cmprow">
+                        <span className="lbl">open shot</span>
+                        <div className="track2"><div className="bar best" style={{ width: w(activeDec.best_available) }} /></div>
+                        <span className="num">{activeDec.best_available.toFixed(2)}</span>
+                      </div>
+                      <div className="cmprow">
+                        <span className="lbl">the pass</span>
+                        <div className="track2"><div className="bar chosen" style={{ width: w(activeDec.post_epv) }} /></div>
+                        <span className="num">{activeDec.post_epv.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+                <div className={`cnote${activeDec.regret_clipped > 0 ? "" : " good"}`}>
+                  {activeDec.regret_clipped > 0
+                    ? <><b>{activeDec.regret_clipped.toFixed(2)}</b> left on the table</>
+                    : <>good read — the pass beat the open shot</>}
+                </div>
               </>
             ) : (
-              "Scrub or play; badges appear at each open ball-handler pass-up decision."
+              "Scrub or play; badges appear at each open ball-handler pass-up decision. Click a tick on the timeline to jump to one."
             )}
           </div>
         </div>
 
         <div className="panel">
+          {topMoments.length > 0 && (
+            <>
+              <h3>Biggest misses this game</h3>
+              <div className="reel">
+                {topMoments.map((m, i) => (
+                  <div className="reelrow" key={i} onClick={() => jumpTo(m.pi, m.frame)} title={`Jump to possession ${m.pi + 1}`}>
+                    <span className={`badge ${m.badge}`}>{BADGE_LABEL[m.badge]}</span>
+                    <span className="who">{data.players?.[String(m.player)]?.name || "?"}</span>
+                    <span className="pts">{m.regret_clipped.toFixed(2)} left</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
           <h3>Possession review</h3>
           <div className="poss-meta">
             <b>{offAbbr}</b> on offense · Q{poss?.period} · ended <b>{poss?.end_reason?.replace(/_/g, " ")}</b> ({outcomePts})
+            {possPointsLeft > 0 && <> · <b>{possPointsLeft.toFixed(2)}</b> pts left on the table</>}
           </div>
           <h3>Decisions</h3>
           <DecisionList decisions={poss?.decisions} players={data.players} activeIdx={activeIdx} onPick={pick} />

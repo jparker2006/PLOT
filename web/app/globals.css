@@ -33,6 +33,9 @@ a { color: var(--accent); }
 .title h1 { font-size: 26px; margin: 0; letter-spacing: -0.4px; }
 .title .tag { color: var(--muted); font-size: 14px; }
 
+.lede { color: var(--ink); font-size: 15px; line-height: 1.6; margin: 14px 0 4px; max-width: 820px; }
+.lede b { color: var(--accent); }
+
 .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 16px 0; }
 .controls select, .controls button {
   background: var(--panel-2); color: var(--ink); border: 1px solid var(--line);
@@ -49,15 +52,24 @@ a { color: var(--accent); }
 .courtrow .court { flex: 1; min-width: 0; }
 .courtcard canvas { width: 100%; height: auto; display: block; border-radius: 8px; }
 
-.evalbar { width: 40px; display: flex; flex-direction: column; align-items: center; }
-.evalbar .track { position: relative; flex: 1; width: 22px; background: #0c1118; border: 1px solid var(--line); border-radius: 11px; overflow: hidden; }
-.evalbar .fill { position: absolute; bottom: 0; left: 0; right: 0; transition: height 80ms linear, background 120ms linear; }
-.evalbar .mid { position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed #3a4a60; }
+.evalbar { width: 42px; display: flex; flex-direction: column; align-items: center; }
+.evalbar .track { position: relative; flex: 1; width: 24px; background: linear-gradient(to top, #0a0f15, #141d28); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.evalbar .fill { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, #2e7be0, #2fa060); box-shadow: 0 0 8px rgba(47,160,96,0.35); transition: height 80ms linear; }
+.evalbar .tick { position: absolute; left: 0; right: 0; border-top: 1px solid rgba(255,255,255,0.10); }
+.evalbar .tick.ref { border-top: 1px dashed rgba(255,255,255,0.5); }
 .evalbar .val { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--ink); margin-bottom: 6px; font-weight: 700; }
-.evalbar .cap { font-size: 10px; color: var(--muted); margin-top: 6px; }
+.evalbar .cap { font-size: 10px; color: var(--muted); margin-top: 6px; letter-spacing: 0.5px; }
 
-.scrub { margin-top: 12px; }
-.scrub input[type=range] { width: 100%; accent-color: var(--accent); }
+.scrub { margin-top: 14px; }
+.scrubwrap { position: relative; padding-top: 12px; }
+.scrubwrap input[type=range] { width: 100%; accent-color: var(--accent); margin: 0; }
+.tickmark { position: absolute; top: 0; width: 4px; height: 12px; padding: 0; border: none; border-radius: 2px; transform: translateX(-50%); cursor: pointer; opacity: 0.85; }
+.tickmark:hover { opacity: 1; height: 16px; outline: 1px solid #fff; }
+.tickmark.great { background: var(--great); }
+.tickmark.good { background: var(--good); }
+.tickmark.inaccuracy { background: var(--inaccuracy); }
+.tickmark.mistake { background: var(--mistake); }
+.tickmark.blunder { background: var(--blunder); }
 .scrub .clock { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; margin-top: 4px; font-variant-numeric: tabular-nums; }
 
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
@@ -81,9 +93,31 @@ a { color: var(--accent); }
 .badge.mistake { background: var(--mistake); }
 .badge.blunder { background: var(--blunder); color: #fff; }
 
-.callout { margin-top: 12px; min-height: 54px; padding: 10px 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); font-size: 13px; line-height: 1.5; }
-.callout.empty { color: var(--muted); }
+.callout { margin-top: 12px; min-height: 96px; padding: 11px 13px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); font-size: 13px; line-height: 1.5; }
+.callout.empty { color: var(--muted); display: flex; align-items: center; }
+.callout .cline { margin-bottom: 9px; }
+.cmp { display: flex; flex-direction: column; gap: 5px; }
+.cmprow { display: flex; align-items: center; gap: 8px; }
+.cmprow .lbl { width: 64px; color: var(--muted); font-size: 11px; flex: none; }
+.cmprow .track2 { flex: 1; height: 9px; background: #0c1118; border-radius: 5px; overflow: hidden; }
+.cmprow .bar { height: 100%; border-radius: 5px; transition: width 120ms ease; }
+.cmprow .bar.best { background: var(--accent); }
+.cmprow .bar.chosen { background: #8b98a9; }
+.cmprow .num { width: 34px; text-align: right; font-variant-numeric: tabular-nums; font-size: 12px; color: var(--ink); flex: none; }
+.cnote { margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--mistake); }
+.cnote.good { color: var(--good); }
 
 .legend { margin-top: 18px; color: var(--muted); font-size: 12px; line-height: 1.7; }
 .legend .badge { margin-right: 4px; }
-.foot { margin-top: 28px; color: var(--muted); font-size: 12px; line-height: 1.6; border-top: 1px solid var(--line); padding-top: 14px; }
+
+/* game-level highlight reel */
+.reel { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.reelrow { display: flex; gap: 10px; align-items: center; padding: 7px 10px; border-radius: 8px; background: var(--panel-2); border: 1px solid transparent; cursor: pointer; }
+.reelrow:hover { border-color: var(--accent); }
+.reelrow .who { flex: 1; font-size: 13px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.reelrow .pts { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--muted); }
+
+.foot { margin-top: 28px; color: var(--muted); font-size: 12.5px; line-height: 1.65; border-top: 1px solid var(--line); padding-top: 14px; }
+.foot p { margin: 0 0 10px; max-width: 860px; }
+.foot b { color: var(--ink); }
+.foot .limits { font-size: 11.5px; }

@@ -1,26 +1,74 @@
 [
   {
+    "game_id": "0021500336",
+    "matchup": "GSW @ BOS",
+    "n_possessions": 10,
+    "badge_counts": {
+      "great": 24,
+      "good": 31,
+      "inaccuracy": 2,
+      "mistake": 2,
+      "blunder": 13
+    }
+  },
+  {
+    "game_id": "0021500214",
+    "matchup": "LAL @ GSW",
+    "n_possessions": 10,
+    "badge_counts": {
+      "great": 27,
+      "good": 13,
+      "inaccuracy": 4,
+      "mistake": 7,
+      "blunder": 7
+    }
+  },
+  {
+    "game_id": "0021500013",
+    "matchup": "SAS @ OKC",
+    "n_possessions": 10,
+    "badge_counts": {
+      "great": 23,
+      "good": 13,
+      "inaccuracy": 5,
+      "mistake": 1,
+      "blunder": 12
+    }
+  },
+  {
+    "game_id": "0021500367",
+    "matchup": "CLE @ BOS",
+    "n_possessions": 10,
+    "badge_counts": {
+      "great": 6,
+      "good": 13,
+      "inaccuracy": 4,
+      "mistake": 3,
+      "blunder": 15
+    }
+  },
+  {
     "game_id": "0021500308",
     "matchup": "LAL @ TOR",
-    "n_possessions": 12,
+    "n_possessions": 10,
     "badge_counts": {
-      "great": 13,
-      "good": 15,
-      "inaccuracy": 7,
-      "mistake": 8,
-      "blunder": 15
+      "great": 15,
+      "good": 20,
+      "inaccuracy": 5,
+      "mistake": 5,
+      "blunder": 14
     }
   },
   {
     "game_id": "0021500203",
     "matchup": "ORL @ CLE",
-    "n_possessions": 12,
+    "n_possessions": 10,
     "badge_counts": {
-      "great": 6,
-      "good": 23,
-      "inaccuracy": 8,
-      "mistake": 8,
-      "blunder": 14
+      "great": 7,
+      "good": 21,
+      "inaccuracy": 2,
+      "mistake": 1,
+      "blunder": 10
     }
   }
 ]
